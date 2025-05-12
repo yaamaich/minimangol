@@ -6,28 +6,14 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 17:23:49 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/09 22:15:45 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/12 20:22:11 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int whitespaces(char str)
-{
-	if (str[i] == 32 || str[i] >= 9 && str[i] <= 13)
-		return (1);
-	return (0);
-}
-t_lexer *initialize_lexer(char *string)
-{
-	t_lexer *lexer;
-	
-	lexer = malloc(sizeof(t_lexer));
-	lexer->input = string;
-	lexer->position = 0;
-	lexer->length = ft_strlen(string);
-	return lexer;
-}
+//PHASE 1//
+
 char    *get_next_token(t_lexer *lexer)
 {
 	char current_char; 
@@ -71,11 +57,6 @@ t_token     *handle_quotes(t_lexer *lexer, char quote_char)
 	return (token);
 }
 
-void handle_operator(t_parser *parser, t_token *op_token)
-{
-	
-}
-
 t_token_type    classify_token(t_token *token)
 {
 	if (ft_strcmp(token->value, "|") == 0)
@@ -97,17 +78,22 @@ t_token_type    classify_token(t_token *token)
 	else
 		return	(WORD_TOKEN);
 }
+//PHASE 2//
 
-t_parser *initialize_shunting_yard(void)
+void handle_operator(t_parser *parser, t_token *op_token)
 {
-	t_parser *parser;
-	
-	parser = malloc(sizeof(t_parser));
-	parser->op_stack = creat_empty_stack();
-	parser->output_queue = creat_empty_queue();
-	return (parser);
-}
+	int top_op;
 
+	
+	while (!(is_empty(parser->op_stack)) && precedence(top(parser->op_stack)->type)
+		>= precedence(op_token) && top(parser->op_stack)->type != L_PAREN_TOKEN)
+	{
+		top_op = pop(parser->op_stack);
+		
+		enqueue(parser->output_queue, top_op);
+	}
+	push(parser->op_stack, op_token);
+}
 void process_token(t_parser *parser, t_token *token)
 {
 	int op;
@@ -131,14 +117,34 @@ void process_token(t_parser *parser, t_token *token)
 			report_error("Mismatched paentheses");
 	}
 }
-void handle_operator(t_parser *parser, t_token *op_token)
+
+void finalize_parsing(t_parser *parser)
 {
-	while (!(is_empty(parser->op_stack)) && precedence(top(parser->op_stack)->type)
-		>= precedence(op_token) && top(parser->op_stack)->type != L_PAREN_TOKEN)
+	t_token *op;
+	
+	while (!(is_empty(parser->op_stack)))
 	{
-		top_op = pop(parser->op_stack);	
+		op = pop(parser->op_stack);
+		if (op->type == L_PAREN_TOKEN)
+		{
+			report_error("Mismatched parentheses");
+		}
+		enqueue(parser->output_queue, op);
+	}
+}
+//PHASE 3//
+
+t_list *build_command_tree(t_parser *parser)
+{
+	t_stack	stack;
+
+	stack = creat_empty_stack();
+
+	while (!(is_empty(parser->output_queue)))
+	{
 		
 	}
+	
 }
 
 int main()
