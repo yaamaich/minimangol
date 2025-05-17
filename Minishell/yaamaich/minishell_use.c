@@ -6,13 +6,13 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 20:26:42 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/12 21:43:34 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/13 20:35:13 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void    PUSH(t_node_stack **stack, t_node *node)
+void    push_stack(t_node_stack **stack, t_node *node)
 {
 	t_node_stack *new_node;
 	
@@ -22,12 +22,12 @@ void    PUSH(t_node_stack **stack, t_node *node)
 	*stack = new_node;
 }
 
-t_node  *POP(t_node_stack **stack)
+t_node  *pop_stack(t_node_stack **stack)
 {
 	t_node_stack *top;
 	t_node  *node;
 
-	if (!**stack || !*stack)
+	if (!stack || !*stack)
 		return NULL;
 	top = *stack;
 	node = top->node;
@@ -36,7 +36,7 @@ t_node  *POP(t_node_stack **stack)
 	return node;
 }
 
-t_node *TOP(t_node_stack *stack)
+t_node *top_stack(t_node_stack *stack)
 {
 	if(!stack)
 		return NULL;

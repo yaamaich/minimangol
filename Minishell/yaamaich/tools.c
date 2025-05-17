@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 20:07:51 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/12 20:10:22 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/13 21:04:33 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,13 @@
 
 int whitespaces(char str)
 {
-	if (str[i] == 32 || str[i] >= 9 && str[i] <= 13)
+	if (str == 32 || str >= 9 && str <= 13)
 		return (1);
 	return (0);
+}
+t_stack *creat_empty_stack(t_stack *stack)
+{
+	
 }
 t_lexer *initialize_lexer(char *string)
 {

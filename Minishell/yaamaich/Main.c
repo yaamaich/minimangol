@@ -6,13 +6,42 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 17:23:49 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/12 20:22:11 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/14 20:27:22 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 //PHASE 1//
+
+t_token *handle_operator(t_lexer *lexer)
+{
+    t_token *token;
+    char	*input;
+    int 	pos;
+
+	input = lexer->input;
+	pos = lexer->position;
+    token = malloc(sizeof(t_token));
+    if (!token)
+        return NULL;
+    if (input[pos] == '>' && input[pos + 1] == '>')
+    {
+        token->value = ft_strdup(">>");
+        lexer->position += 2;
+    }else if (input[pos] == '<' && input[pos + 1] == '<')
+    {
+        token->value = ft_strdup("<<");
+        lexer->position += 2;
+    }else
+    {
+        token->value = ft_substr(input, pos, 1);
+        lexer->position += 1;
+    }
+    token->type = classify_token(token);
+    return token;
+}
+
 
 char    *get_next_token(t_lexer *lexer)
 {
@@ -25,7 +54,7 @@ char    *get_next_token(t_lexer *lexer)
 	current_char = lexer->input[lexer->position];
 	
 	if (current_char == '\'' || current_char == '"')
-		return (handle_quotes(lexer, current_char))
+		return (handle_quotes(lexer, current_char));
 	if (current_char == '|' || current_char == '<' || current_char == '>' 
 		|| current_char == '(' || current_char == ')')
 			return (handle_operator(lexer));
@@ -51,7 +80,7 @@ t_token     *handle_quotes(t_lexer *lexer, char quote_char)
 
 	token = malloc(sizeof(t_token));
 	token->value = content;
-	token->quete_type = quote_char;
+	token->qute_type = quote_char;
 	token->type = WORD_TOKEN;
 
 	return (token);
@@ -60,7 +89,7 @@ t_token     *handle_quotes(t_lexer *lexer, char quote_char)
 t_token_type    classify_token(t_token *token)
 {
 	if (ft_strcmp(token->value, "|") == 0)
-		return (OP_TOKE);
+		return (OP_TOKEN);
 	else if ((ft_strcmp(token->value, "<") == 0))
 		return  (REDIR_IN);
 	else if ((ft_strcmp(token->value, ">") == 0))
@@ -73,46 +102,69 @@ t_token_type    classify_token(t_token *token)
 		return (L_PAREN_TOKEN);
 	else if ((ft_strcmp(token->value, ")") == 0))
 		return (R_PAREN_TOKEN);
-	else if (is_the first_token_in_command(token))
-		return (CMD_TOKEN)
+	else if (first_token_in_command(token))
+		return (CMD_TOKEN);
 	else
 		return	(WORD_TOKEN);
 }
 //PHASE 2//
 
-void handle_operator(t_parser *parser, t_token *op_token)
+int precedence(t_token_type type)
 {
-	int top_op;
+	
+}
+void enqueue(t_queue *queue, t_token *token)
+{
+	t_queue_node *new_queue;
+
+	new_queue = malloc (sizeof(t_queue_node));
+	new_queue->token = token;
+	new_queue->next = NULL;
+	
+	if (queue->head == NULL)
+	{
+		queue->head = new_queue;
+		queue->tail = new_queue;
+	}else
+	{
+		queue->tail->next = new_queue;
+		queue->tail = new_queue;
+	}
+}
+
+void handle_operators(t_parser *parser, t_token *op_token)
+{
+	t_node top_op;
 
 	
-	while (!(is_empty(parser->op_stack)) && precedence(top(parser->op_stack)->type)
-		>= precedence(op_token) && top(parser->op_stack)->type != L_PAREN_TOKEN)
+	while (!(is_empty(parser->op_stack)) && precedence(top_stack(parser->op_stack)->token->type)
+		>= precedence(op_token) && top_stack(parser->op_stack)->token->type != L_PAREN_TOKEN)
 	{
-		top_op = pop(parser->op_stack);
+		top_op = pop_stack(parser->op_stack);
 		
 		enqueue(parser->output_queue, top_op);
 	}
-	push(parser->op_stack, op_token);
+	push_stack(parser->op_stack, op_token);
 }
 void process_token(t_parser *parser, t_token *token)
 {
-	int op;
+	t_node *op;
 
 	if (token->type == CMD_TOKEN || token->type == WORD_TOKEN)
 		enqueue(parser->output_queue, token);
 	else if (token->type == OP_TOKEN)
-		handle_operator(parser, token);
+		handle_operators(parser, token);
 	else if (token->type == L_PAREN_TOKEN)
-		push(parser->op_stack, token);
+		push_stack(parser->op_stack, token);
 	else if (token->type == L_PAREN_TOKEN)
 	{
-		while (!(is_empty(parser->op_stack)) && top((parser->op_stack)->type))
+		while (!(is_empty(parser->op_stack)) && top_stack((parser->op_stack)->top->token->type))
 		{
-			op = pop(parser->op_stack);
+			op = pop_stack(parser->op_stack);
 			enqueue(parser->output_queue, op);
 		}
 		if (!is_empty(parser->op_stack))
-			pop(parser->op_stack);
+			pop_stack(parser->op_stack);
 		else
 			report_error("Mismatched paentheses");
 	}
@@ -124,7 +176,7 @@ void finalize_parsing(t_parser *parser)
 	
 	while (!(is_empty(parser->op_stack)))
 	{
-		op = pop(parser->op_stack);
+		op = pop_stack(parser->op_stack);
 		if (op->type == L_PAREN_TOKEN)
 		{
 			report_error("Mismatched parentheses");
@@ -137,6 +189,7 @@ void finalize_parsing(t_parser *parser)
 t_list *build_command_tree(t_parser *parser)
 {
 	t_stack	stack;
+	
 
 	stack = creat_empty_stack();
 
