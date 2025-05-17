@@ -6,11 +6,20 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 20:26:42 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/13 20:35:13 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/17 11:16:04 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+
+t_stack	*creat_empty_stack (void)
+{
+	t_stack *stack;
+	stack = malloc(sizeof(t_stack));
+	stack->top = NULL;
+	return (stack);
+}
 
 void    push_stack(t_node_stack **stack, t_node *node)
 {

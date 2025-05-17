@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 13:00:24 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/13 22:02:21 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/17 12:54:40 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ typedef enum {
 	CMD_TOKEN,
 	WORD_TOKEN,
 	OP_TOKEN,
+	AND_IF,
+	OR_IF,
 	REDIR_IN,
 	REDIR_OUT,
 	APPEND,
@@ -71,15 +73,16 @@ typedef struct s_queue
 
 typedef struct s_parser
 {
-    t_stack  *op_stack;
-    t_queue  *output_queue;
+	t_stack  *op_stack;
+	t_queue  *output_queue;
 }
 				t_parser;
 				
 typedef struct s_node {
-    t_token        *token;
-    struct s_node *left;
-    struct s_node *right;
+	t_token        	*token;
+	int				token_type;
+	struct s_node 	*left;
+	struct s_node 	*right;
 } 				t_node;
 
 typedef struct s_node_stack
@@ -87,6 +90,36 @@ typedef struct s_node_stack
 	t_node				*node;
 	struct s_node_stack	*next;
 }				t_node_stack;
+
+typedef struct s_redir
+{
+	t_token_type	type;
+	char			*filename;
+	struct s_redir	*next;
+} 				t_redir;
+
+// typedef struct s_redir_token {
+//     int						type;
+//     char					*file;
+//     struct s_redir_token	*next;
+// } 				t_redir_token;
+
+
+typedef struct s_cmd_node
+{
+	char				*cmd;
+	char				*args;
+	t_redir				*redir; 
+	struct s_cmd_node	*next;
+}				t_cmd_node;
+
+typedef struct s_op_node {
+    char		*op_str;
+    int			precedence;
+    int			type;
+}				t_op_node;
+
+
 
 
 
