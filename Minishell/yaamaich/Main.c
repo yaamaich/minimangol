@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 17:23:49 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/20 01:35:47 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/20 19:47:12 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ t_token *handle_word(t_lexer *lexer)
         return NULL;
     }
 
-    token->type = WORD_TOKEN;
+    token->type = CMD_TOKEN;
     token->value = word;
     token->quete_type = 0;
     token->pipe_read = -1;
@@ -527,62 +527,113 @@ int setup_pipes(t_node *cmd_tree)
     return 1;
 }
 
+// #include "minishell.h"
+
+// int main(void)
+// {
+//     // 1. اختبار initialize_lexer
+//     char *input = "echo hello world";
+//     t_lexer *lexer = initialize_lexer(input);
+//     if (!lexer)
+//     {
+//         report_mesage("Failed to initialize lexer\n");
+//         return 1;
+//     }
+//     report_mesage("Lexer initialized successfully\n");
+
+//     // 2. اختبار creat_empty_stack و is_empty
+//     t_stack *stack = creat_empty_stack();
+//     if (is_empty(stack))
+//         report_mesage("Stack is empty\n");
+//     else
+//         report_mesage("Stack is not empty\n");
+
+//     // 3. اختبار creat_empty_queue
+//     t_queue *queue = creat_empty_queue();
+//     if (queue && !queue->head && !queue->tail)
+//         report_mesage("Queue initialized empty\n");
+//     else
+//         report_mesage("Queue initialization failed\n");
+
+//     // 4. اختبار initialize_shunting_yard
+//     t_parser *parser = initialize_shunting_yard();
+//     if (parser && parser->op_stack && parser->output_queue)
+//         report_mesage("Parser initialized successfully\n");
+//     else
+//         report_mesage("Parser initialization failed\n");
+
+//     // 5. اختبار create_tree_node و create_operator_node
+//     t_token dummy_token = {CMD_TOKEN, "echo", 0, 0, 0};
+//     t_node *node1 = create_tree_node(&dummy_token);
+//     t_node *node2 = create_tree_node(&dummy_token);
+//     t_node *op_node = create_operator_node(&dummy_token, node1, node2);
+
+//     if (node1 && node2 && op_node)
+//         report_mesage("Tree nodes created successfully\n");
+//     else
+//         report_mesage("Failed to create tree nodes\n");
+
+//     // تنظيف الذاكرة (اختياري هنا لكن جيد)
+//     free(lexer);
+//     free(stack);
+//     free(queue);
+//     free(parser->op_stack);
+//     free(parser->output_queue);
+//     free(parser);
+//     free(node1);
+//     free(node2);
+//     free(op_node);
+
+//     return 0;
+// }
+#include "minishell.h"
+
 #include "minishell.h"
 
 int main(void)
 {
-    // 1. اختبار initialize_lexer
-    char *input = "echo hello world";
-    t_lexer *lexer = initialize_lexer(input);
-    if (!lexer)
+    char *input;
+    t_lexer *lexer;
+    t_parser *parser;
+    t_token *token;
+
+    while (1)
     {
-        report_mesage("Failed to initialize lexer\n");
-        return 1;
+        input = readline("minishell> ");
+        if (!input) // Ctrl+D
+            break;
+        if (ft_strcmp(input, "exit") == 0)
+        {
+            free(input);
+            break;
+        }
+        if (input[0] != '\0')
+        {
+            add_history(input);
+
+            // تهيئة lexer بالمدخل
+            lexer = initialize_lexer(input);
+
+            // تهيئة parser (شنتينج يارد)
+            parser = initialize_shunting_yard();
+
+            ft_printf("Tokens:\n");
+            // نستخرج التوكنات واحدة واحدة حتى ما نخلص
+            while ((token = get_next_token(lexer)) != NULL)
+            {
+                ft_printf("Type: %d, Value: %s\n", token->type, token->value);
+                free(token->value);
+                free(token);
+            }
+
+            // هنا ممكن نكمل بناء الشجرة مثلاً لاحقاً باستخدام parser
+
+            free(lexer);
+            free(parser);
+        }
+        free(input);
     }
-    report_mesage("Lexer initialized successfully\n");
-
-    // 2. اختبار creat_empty_stack و is_empty
-    t_stack *stack = creat_empty_stack();
-    if (is_empty(stack))
-        report_mesage("Stack is empty\n");
-    else
-        report_mesage("Stack is not empty\n");
-
-    // 3. اختبار creat_empty_queue
-    t_queue *queue = creat_empty_queue();
-    if (queue && !queue->head && !queue->tail)
-        report_mesage("Queue initialized empty\n");
-    else
-        report_mesage("Queue initialization failed\n");
-
-    // 4. اختبار initialize_shunting_yard
-    t_parser *parser = initialize_shunting_yard();
-    if (parser && parser->op_stack && parser->output_queue)
-        report_mesage("Parser initialized successfully\n");
-    else
-        report_mesage("Parser initialization failed\n");
-
-    // 5. اختبار create_tree_node و create_operator_node
-    t_token dummy_token = {CMD_TOKEN, "echo", 0, 0, 0};
-    t_node *node1 = create_tree_node(&dummy_token);
-    t_node *node2 = create_tree_node(&dummy_token);
-    t_node *op_node = create_operator_node(&dummy_token, node1, node2);
-
-    if (node1 && node2 && op_node)
-        report_mesage("Tree nodes created successfully\n");
-    else
-        report_mesage("Failed to create tree nodes\n");
-
-    // تنظيف الذاكرة (اختياري هنا لكن جيد)
-    free(lexer);
-    free(stack);
-    free(queue);
-    free(parser->op_stack);
-    free(parser->output_queue);
-    free(parser);
-    free(node1);
-    free(node2);
-    free(op_node);
-
+    ft_printf("Goodbye!\n");
     return 0;
 }
+
