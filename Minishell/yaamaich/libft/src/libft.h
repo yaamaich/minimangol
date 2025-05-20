@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/26 00:52:26 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/04/25 12:18:15 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/19 23:51:25 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ int					ft_isprint(int c);
 void				*ft_memcpy(void *to, const void *from, size_t c);
 void				*ft_memmove(void *to, const void *from, size_t len);
 void				*ft_memset(void *str, int c, size_t len);
-size_t				ft_strlen(const char *c);
+int					ft_strlen(const char *c);
 int					ft_isalnum(int str);
 int					ft_isalpha(int str);
 int					ft_isascii(int a);
@@ -83,6 +83,8 @@ int					ft_putptr(void *s);
 int					ft_putchar(char c);
 int					ft_putstr(char *str);
 int					ft_printf(const char *format, ...);
-int					ft_strcmp(char*s1, char	*s2);
+int					ft_strcmp(char*s1, const char	*s2);
+int					ft_isalphanumiric(char str);
+
 
 #endif

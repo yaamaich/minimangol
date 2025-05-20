@@ -6,14 +6,13 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 12:08:36 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/04/25 12:16:22 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/19 23:56:46 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <stdio.h>
 
-int ft_strcmp(char *s1, char *s2)
+int ft_strcmp(char *s1, const char *s2)
 {
 	int i;
 	

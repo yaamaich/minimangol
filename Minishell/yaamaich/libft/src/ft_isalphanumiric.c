@@ -1,25 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlen.c                                        :+:      :+:    :+:   */
+/*   ft_isalphanumiric.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/23 12:27:51 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/19 23:39:35 by yaamaich         ###   ########.fr       */
+/*   Created: 2025/05/18 22:28:47 by yaamaich          #+#    #+#             */
+/*   Updated: 2025/05/18 22:37:18 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-int	ft_strlen(const char *c)
+int	ft_isalphanumiric(char str)
 {
-	int	i;
-
-	i = 0;
-	while (c[i])
-	{
-		i++;
-	}
-	return (i);
+	if (ft_isalpha(str) || (ft_isdigit(str)))
+		return (0);
+	else
+		return (1);
 }

@@ -6,23 +6,11 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 01:20:24 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/04/09 04:54:52 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/19 23:53:54 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-
-size_t	ft_strlen(const char *c)
-{
-	size_t	i;
-
-	i = 0;
-	if (!c)
-		return (0);
-	while (c[i])
-		i++;
-	return (i);
-}
 
 char	*ft_substr(const char *s, unsigned int start, size_t len)
 {

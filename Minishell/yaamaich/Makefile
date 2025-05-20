@@ -1,11 +1,12 @@
 NAME = minishell.a
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -I libft/include 
+CFLAGS = -Wall -Wextra -Werror -I libft/include -lreadline -o minishell.a
+
 
 LIBFT = libft/libft.a 
 
-SRC = Main.c
+SRC = Main.c minishell_use.c tools.c
 
 all: $(NAME)
 

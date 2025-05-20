@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 20:07:51 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/17 11:13:44 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/19 23:50:47 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,9 @@ int is_empty(t_stack *stack)
 }
 int whitespaces(char str)
 {
-	if (str == 32 || str >= 9 && str <= 13)
+	if (str == 32 ||( str >= 9 && str <= 13))
 		return (1);
 	return (0);
-}
-t_stack *creat_empty_stack(t_stack *stack)
-{
-	
 }
 t_lexer *initialize_lexer(char *string)
 {
@@ -48,13 +44,24 @@ t_lexer *initialize_lexer(char *string)
 }
 
 // phase 2 //
+t_queue *creat_empty_queue(void)
+{
+    t_queue *queue;
+
+    queue = (t_queue *)malloc(sizeof(t_queue));
+    if (!queue)
+        return (NULL);
+    queue->head = NULL;
+    queue->tail = NULL;
+    return (queue);
+}
 
 t_parser *initialize_shunting_yard(void)
 {
 	t_parser *parser;
 	
 	parser = malloc(sizeof(t_parser));
-	parser->op_stack = creat_empty_stack(parser->op_stack);
+	parser->op_stack = creat_empty_stack();
 	parser->output_queue = creat_empty_queue();
 	return (parser);
 }
