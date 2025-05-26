@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 13:00:24 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/19 23:59:13 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/24 04:51:13 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,8 +133,40 @@ typedef struct s_env
 }				t_env;
 
 
+//phase1//
+t_token *handle_operator(t_lexer *lexer);
+t_token *handle_word(t_lexer *lexer);
+t_token *handle_quotes(t_lexer *lexer, char quote);
+t_token *get_next_token(t_lexer *lexer);
+t_token_type    classify_token(t_token *token);
+t_token	*first_token_in_command(t_token *token);
+
+//pahse2//
+int precedence(t_token_type type);
+void enqueue(t_queue *queue, t_token *token);
+void handle_operators(t_parser *parser);
+void process_token(t_parser *parser, t_token *token);
+void finalize_parsing(t_parser *parser);
+
+//phase3//
+t_token *dequeue(t_queue *queue);
+t_node *build_command_tree(t_parser *parser);
+void add_redirection(t_cmd_node *cmd, t_redir *redir);
+t_cmd_node *creat_command_node(char *cmd, char *args);
+t_node *connect_commands(t_node *left, t_node *right, t_op_node *op);
+
+//phase4//
+char *get_env_value(char **env, const char *var_name);
+char *expand_variables(char *str, t_env *env);
+char *expand_exit_status(char *str, int last_exit_status);
 
 
+//phase5//
+int create_heredoc(const char *delimiter);
+int handle_redirections(t_cmd_node *cmd);
+int setup_pipes(t_node *cmd_tree);
+
+//tools//
 int whitespaces(char str);
 int is_empty(t_stack *stack);
 void report_mesage (char *str);
@@ -144,14 +176,7 @@ t_parser *initialize_shunting_yard(void);
 t_node *create_tree_node(t_token *token);
 t_node *create_operator_node(t_token *token, t_node *left, t_node *right);
 
-t_token    *get_next_token(t_lexer *lexer);
-void finalize_parsing(t_parser *parser);
-t_node *build_command_tree(t_parser *parser);
-t_token_type    classify_token(t_token *token);
-void process_token(t_parser *parser, t_token *token);
-void handle_operators(t_parser *parser);
-t_token     *handle_quotes(t_lexer *lexer, char quote_char);
-
+//minishell_use//
 t_node *top_stack(t_node_stack *stack);
 t_stack	*creat_empty_stack (void);
 int	size_node_stack(t_node_stack *stack);

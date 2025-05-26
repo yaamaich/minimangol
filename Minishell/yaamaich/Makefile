@@ -1,4 +1,4 @@
-NAME = minishell.a
+NAME = minishell
 
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -I libft/include -lreadline -o minishell.a
