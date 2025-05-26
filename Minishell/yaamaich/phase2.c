@@ -6,11 +6,11 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/24 04:40:28 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/24 04:40:39 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/26 06:44:52 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-include "minishell.h"
+#include "minishell.h"
 
 //PHASE 2//
 
@@ -48,19 +48,19 @@ void enqueue(t_queue *queue, t_token *token)
 	}
 }
 
-void handle_operators(t_parser *parser)
+void handle_operators(t_parser *parser, t_token *op_token)
 {
 	t_node *top_op;
 
 	
 	while (!(is_empty(parser->op_stack)) && precedence(top_stack(parser->stack)->token->type)
-		>= precedence(OP_TOKEN) && top_stack(parser->stack)->token->type != L_PAREN_TOKEN)
+		>= precedence(op_token->type) && top_stack(parser->stack)->token->type != L_PAREN_TOKEN)
 	{
 		top_op = pop_stack(&parser->stack);
 		
 		enqueue(parser->output_queue, top_op->token);
 	}
-	push_stack(&parser->stack, top_op);
+	push_stack(&parser->stack, op_token);
 }
 void process_token(t_parser *parser, t_token *token)
 {
@@ -69,14 +69,14 @@ void process_token(t_parser *parser, t_token *token)
 	if (token->type == CMD_TOKEN || token->type == WORD_TOKEN)
 		enqueue(parser->output_queue, token);
 	else if (token->type == OP_TOKEN)
-		handle_operators(parser);
+		handle_operators(parser, token);
 	else if (token->type == L_PAREN_TOKEN)
-		push_stack(&parser->stack, parser->stack->node);
+		push_stack(&parser->op_stack, token);
 	else if (token->type == L_PAREN_TOKEN)
 	{
 		while (!(is_empty(parser->op_stack)) && top_stack(parser->stack)->token->type)
 		{
-			op = pop_stack(&parser->stack);
+			op = pop_stack(&parser->op_stack);
 			enqueue(parser->output_queue, op->token);
 		}
 		if (!is_empty(parser->op_stack))

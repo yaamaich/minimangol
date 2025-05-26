@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 20:26:42 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/19 22:37:22 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/26 06:49:28 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,28 +21,38 @@ t_stack	*creat_empty_stack (void)
 	return (stack);
 }
 
-void    push_stack(t_node_stack **stack, t_node *node)
+void    push_stack(t_stack **stack, t_token *token)
 {
-	t_node_stack *new_node;
-	
-	new_node = malloc (sizeof(t_node_stack));
-	new_node->node = node;
-	new_node->next = *stack;
-	*stack = new_node;
+    t_stack_node *new_node = malloc(sizeof(t_stack_node));
+    if (!new_node)
+        return; // Handle error
+    new_node->token = token;
+    new_node->next = (*stack)->top;
+    (*stack)->top = new_node;
 }
 
-t_node  *pop_stack(t_node_stack **stack)
+t_token *pop_token_stack(t_stack **stack)
 {
-	t_node_stack *top;
-	t_node  *node;
+    if (!stack || !*stack || !(*stack)->top)
+        return NULL;
 
-	if (!stack || !*stack)
-		return NULL;
-	top = *stack;
-	node = top->node;
-	*stack = top->next;
-	free (top);
-	return node;
+    t_stack_node *top_node = (*stack)->top;
+    t_token *token = top_node->token;
+
+    (*stack)->top = top_node->next;
+    free(top_node);
+    return token;
+}
+t_node *pop_node_stack(t_node_stack **stack) {
+    if (!stack || !*stack) 
+        return NULL;
+
+    t_node_stack *top_node = *stack;
+    t_node *node = top_node->node;
+
+    *stack = top_node->next;
+    free(top_node);
+    return node;
 }
 
 t_node *top_stack(t_node_stack *stack)

@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 17:23:49 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/24 05:16:46 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/26 06:22:06 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ int main(void)
     t_lexer *lexer;
     t_parser *parser;
     t_token *token;
-    t_node *cmd_tree;
+    t_node *cmd_tree; 
     t_env *env = initialize_env(); // You'll need to implement this
 
     while (1)

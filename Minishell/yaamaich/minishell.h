@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 13:00:24 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/24 04:51:13 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/26 06:44:43 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,7 +144,7 @@ t_token	*first_token_in_command(t_token *token);
 //pahse2//
 int precedence(t_token_type type);
 void enqueue(t_queue *queue, t_token *token);
-void handle_operators(t_parser *parser);
+void handle_operators(t_parser *parser, t_token *op_token);
 void process_token(t_parser *parser, t_token *token);
 void finalize_parsing(t_parser *parser);
 
@@ -180,7 +180,7 @@ t_node *create_operator_node(t_token *token, t_node *left, t_node *right);
 t_node *top_stack(t_node_stack *stack);
 t_stack	*creat_empty_stack (void);
 int	size_node_stack(t_node_stack *stack);
-t_node  *pop_stack(t_node_stack **stack);
-void    push_stack(t_node_stack **stack, t_node *node);
+t_node  *pop_stack(t_stack **stack);
+void    push_stack(t_stack **stack, t_token *token);
 
 #endif 
