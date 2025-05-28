@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/24 04:46:44 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/24 04:46:59 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/27 06:29:46 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,11 @@ int create_heredoc(const char *delimiter)
 }
 int handle_redirections(t_cmd_node *cmd)
 {
-	t_redir *redir = cmd->redir;
-	int fd;
-
+	int 	fd;
+	t_redir *redir;
+	
+	
+	redir = cmd->redir;
 	while (redir)
 	{
 		if (redir->type == REDIR_IN)

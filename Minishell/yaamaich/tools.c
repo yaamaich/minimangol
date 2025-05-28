@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 20:07:51 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/19 23:50:47 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/28 15:46:52 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,11 +77,4 @@ t_node *create_tree_node(t_token *token)
     return node;
 }
 
-t_node *create_operator_node(t_token *token, t_node *left, t_node *right)
-{
-    t_node *node = malloc(sizeof(t_node));
-    node->token = token;
-    node->left = left;
-    node->right = right;
-    return node;
-}
+

@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 13:00:24 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/26 06:44:43 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/28 15:50:29 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <fcntl.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 # include "libft/src/libft.h"
@@ -40,6 +41,7 @@ typedef enum {
 	HEREDOC,
 	L_PAREN_TOKEN,
 	R_PAREN_TOKEN,
+	PIPE,
 	CMD
 }		t_token_type;
 
@@ -76,23 +78,44 @@ typedef struct s_queue
 }				t_queue;
 
 				
-typedef struct s_node {
-	t_token        	*token;
-	int				token_type;
-	struct s_node 	*left;
-	struct s_node 	*right;
-} 				t_node;
+// typedef struct s_node {
+// 	t_token        	*token;
+// 	t_cmd_node      *cmd; 
+// 	int				token_type;
+// 	struct s_node 	*left;
+// 	struct s_node 	*right;
+// } 				t_node;
 
-typedef struct s_node_stack
-{
-	t_node				*node;
-	struct s_node_stack	*next;
-}				t_node_stack;
+typedef struct s_cmd_node {
+    char            *cmd;
+    char            **args;       // Changed from char*
+    int             arg_count;    // Added missing field
+    struct s_redir  *redir;
+    struct s_cmd_node *next;
+} t_cmd_node;
+
+typedef struct s_node {
+    t_token         *token;
+    int             token_type;
+    t_cmd_node      *cmd;        // Use correct type
+    struct s_node   *left;
+    struct s_node   *right;
+} t_node;
+
+typedef struct s_ast_stack_node {
+    t_node *node;
+    struct s_ast_stack_node *next;
+} t_ast_stack_node;
+
+typedef struct {
+    t_ast_stack_node *top;
+    int size;
+} t_ast_stack;
 
 typedef struct s_parser
 {
 	t_stack  *op_stack;
-	t_node_stack *stack;
+	t_ast_stack *stack;
 	t_queue  *output_queue;
 }				t_parser;
 
@@ -110,13 +133,13 @@ typedef struct s_redir
 // } 				t_redir_token;
 
 
-typedef struct s_cmd_node
-{
-	char				*cmd;
-	char				*args;
-	t_redir				*redir; 
-	struct s_cmd_node	*next;
-}				t_cmd_node;
+// typedef struct s_cmd_node
+// {
+// 	char				*cmd;
+// 	char				*args;
+// 	t_redir				*redir; 
+// 	struct s_cmd_node	*next;
+// }				t_cmd_node;
 
 typedef struct s_op_node {
     t_token		*token;
@@ -152,7 +175,12 @@ void finalize_parsing(t_parser *parser);
 t_token *dequeue(t_queue *queue);
 t_node *build_command_tree(t_parser *parser);
 void add_redirection(t_cmd_node *cmd, t_redir *redir);
-t_cmd_node *creat_command_node(char *cmd, char *args);
+// t_cmd_node *creat_command_node(char *cmd, char *args);
+void add_argument(t_cmd_node *cmd, char *arg);
+t_cmd_node *create_command_node(char *cmd, char *first_arg);  // Fixed typo
+t_node *create_operator_node(t_token *token, t_node *left, t_node *right);
+int is_operator(t_token_type type); 
+
 t_node *connect_commands(t_node *left, t_node *right, t_op_node *op);
 
 //phase4//
@@ -177,10 +205,14 @@ t_node *create_tree_node(t_token *token);
 t_node *create_operator_node(t_token *token, t_node *left, t_node *right);
 
 //minishell_use//
-t_node *top_stack(t_node_stack *stack);
+t_stack_node *top_stack(t_stack *stack);
 t_stack	*creat_empty_stack (void);
-int	size_node_stack(t_node_stack *stack);
-t_node  *pop_stack(t_stack **stack);
+int	size_node_stack(t_stack *stack);
+t_token  *pop_stack(t_stack **stack);
 void    push_stack(t_stack **stack, t_token *token);
+t_node *ast_pop(t_ast_stack *stack);
+t_ast_stack *create_ast_stack();
+void ast_push(t_ast_stack *stack, t_node *node);
+int ast_stack_size(t_ast_stack *stack);
 
 #endif 

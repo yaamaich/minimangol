@@ -6,12 +6,11 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/24 04:48:26 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/26 06:22:29 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/27 05:32:27 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
 
 t_token *handle_operator(t_lexer *lexer)
 {
