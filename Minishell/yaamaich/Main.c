@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 17:23:49 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/28 17:45:22 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/29 16:16:48 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,50 @@ void print_ast(t_node *node, int depth)
     }
 }
 
+t_queue *combine_command_tokens(t_queue *tokens)
+{
+	t_queue *combined = creat_empty_queue();
+	t_token *token;
+	char *command_str = NULL;
+
+	while ((token = dequeue(tokens)))
+	{
+		if (token->type == CMD_TOKEN || token->type == WORD_TOKEN)
+		{
+			if (!command_str)
+				command_str = ft_strdup(token->value);
+			else
+			{
+				char *tmp = command_str;
+				command_str = ft_strjoin(tmp, " ");
+				free(tmp);
+				tmp = command_str;
+				command_str = ft_strjoin(tmp, token->value);
+				free(tmp);
+			}
+		}
+		else
+		{
+			if (command_str)
+			{
+				t_token *cmd_token = create_token(CMD_TOKEN, command_str);
+				enqueue(combined, cmd_token);
+				free(command_str);
+				command_str = NULL;
+			}
+			enqueue(combined, token);
+		}
+	}
+
+	if (command_str)
+	{
+		t_token *cmd_token = create_token(CMD_TOKEN, command_str);
+		enqueue(combined, cmd_token);
+		free(command_str);
+	}
+
+	return combined;
+}
 
 // Updated main function with better debugging
 int main(void) {
@@ -98,11 +142,19 @@ int main(void) {
 
         // Tokenization phase
         printf("\n--- Tokenization ---\n");
+        t_queue *raw_tokens = creat_empty_queue();
         while ((token = get_next_token(lexer))) {
             printf("Token: type=%d, value='%s'\n", token->type, token->value);
-            process_token(parser, token);
+            enqueue(raw_tokens, token);
         }
 
+        t_queue *combined_tokens = combine_command_tokens(raw_tokens);
+        
+        // Post-token-combination
+        t_token *combined_token;
+        while ((combined_token = dequeue(combined_tokens)))
+            process_token(parser, combined_token);
+            
         // Shunting Yard completion
         finalize_parsing(parser);
 

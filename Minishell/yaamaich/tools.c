@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 20:07:51 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/28 15:46:52 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/29 16:20:19 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,21 @@ t_lexer *initialize_lexer(char *string)
 }
 
 // phase 2 //
+t_token *create_token(t_token_type type, const char *value)
+{
+    t_token *token = malloc(sizeof(t_token));
+    if (!token)
+        return NULL;
+
+    token->type = type;
+    token->value = ft_strdup(value);
+    token->quete_type = 0;    // بشكل افتراضي لا يوجد اقتباس
+    token->pipe_read = -1;    // افتراضياً لا يوجد اتصال أنبوب قراءة
+    token->pipe_write = -1;   // افتراضياً لا يوجد اتصال أنبوب كتابة
+
+    return token;
+}
+
 t_queue *creat_empty_queue(void)
 {
     t_queue *queue;

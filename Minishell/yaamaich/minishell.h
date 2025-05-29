@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 13:00:24 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/28 15:50:29 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/29 16:20:06 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,6 +166,7 @@ t_token	*first_token_in_command(t_token *token);
 
 //pahse2//
 int precedence(t_token_type type);
+t_token *create_token(t_token_type type, const char *value);
 void enqueue(t_queue *queue, t_token *token);
 void handle_operators(t_parser *parser, t_token *op_token);
 void process_token(t_parser *parser, t_token *token);
