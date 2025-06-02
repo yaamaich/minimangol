@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/24 04:43:16 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/29 15:57:42 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/31 19:04:53 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,7 +136,7 @@ t_node *build_command_tree(t_parser *parser)
 			ast_push(stack, new_node);
 		}
 	}
-	if (ast_stack_size(stack) != 1)
+	if (ast_stack_size(stack) < 1)
 	{
 		ft_printf("bad trip\n");
 		report_mesage("Invalid expression");

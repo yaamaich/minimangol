@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/24 04:44:46 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/24 04:45:23 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/05/30 16:28:10 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ char *expand_variables(char *str, t_env *env)
 		{
 			i--;
 			start = i;
-			while (ft_isalphanumiric(str[i]) || str[i] == '-')
+			while (ft_isalphanumiric(str[i]) || str[i] == '_')
 			{
 				i++;
 				var_name = ft_substr(str, start, i - start);

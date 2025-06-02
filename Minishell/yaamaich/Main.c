@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 17:23:49 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/29 16:16:48 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/06/02 20:25:03 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,50 @@ void print_ast(t_node *node, int depth)
     }
 }
 
+// t_queue *combine_command_tokens(t_queue *tokens)
+// {
+// 	t_queue *combined = creat_empty_queue();
+// 	t_token *token;
+// 	char *command_str = NULL;
+
+// 	while ((token = dequeue(tokens)))
+// 	{
+// 		if (token->type == CMD_TOKEN || token->type == WORD_TOKEN)
+// 		{
+// 			if (!command_str)
+// 				command_str = ft_strdup(token->value);
+// 			else
+// 			{
+// 				char *tmp = command_str;
+// 				command_str = ft_strjoin(tmp, " ");
+// 				free(tmp);
+// 				tmp = command_str;
+// 				command_str = ft_strjoin(tmp, token->value);
+// 				free(tmp);
+// 			}
+// 		}
+// 		else
+// 		{
+// 			if (command_str)
+// 			{
+// 				t_token *cmd_token = create_token(CMD_TOKEN, command_str);
+// 				enqueue(combined, cmd_token);
+// 				free(command_str);
+// 				command_str = NULL;
+// 			}
+// 			enqueue(combined, token);
+// 		}
+// 	}
+
+// 	if (command_str)
+// 	{
+// 		t_token *cmd_token = create_token(CMD_TOKEN, command_str);
+// 		enqueue(combined, cmd_token);
+// 		free(command_str);
+// 	}
+
+// 	return combined;
+// }
 t_queue *combine_command_tokens(t_queue *tokens)
 {
 	t_queue *combined = creat_empty_queue();
@@ -86,6 +130,7 @@ t_queue *combine_command_tokens(t_queue *tokens)
 
 	while ((token = dequeue(tokens)))
 	{
+		// لو التوكن هو أمر أو كلمة (معامل)
 		if (token->type == CMD_TOKEN || token->type == WORD_TOKEN)
 		{
 			if (!command_str)
@@ -100,8 +145,23 @@ t_queue *combine_command_tokens(t_queue *tokens)
 				free(tmp);
 			}
 		}
+		// لو التوكن خاص بإعادة التوجيه أو أنبوب (PIPE, REDIRECTION)
+		else if (token->type == PIPE || token->type == REDIR_OUT || token->type == APPEND /* مثلا */)
+		{
+			// أولاً نضيف الأمر الحالي لو كان كاين
+			if (command_str)
+			{
+				t_token *cmd_token = create_token(CMD_TOKEN, command_str);
+				enqueue(combined, cmd_token);
+				free(command_str);
+				command_str = NULL;
+			}
+			// ثم نضيف التوكن الخاص بإعادة التوجيه أو الأنبوب كتوكن مستقل
+			enqueue(combined, token);
+		}
 		else
 		{
+			// لو توكن آخر غير معروف، نضيفه مباشرة
 			if (command_str)
 			{
 				t_token *cmd_token = create_token(CMD_TOKEN, command_str);
@@ -122,6 +182,7 @@ t_queue *combine_command_tokens(t_queue *tokens)
 
 	return combined;
 }
+
 
 // Updated main function with better debugging
 int main(void) {
@@ -148,7 +209,9 @@ int main(void) {
             enqueue(raw_tokens, token);
         }
 
-        t_queue *combined_tokens = combine_command_tokens(raw_tokens);
+        t_queue *combined_tokens;
+        
+        combined_tokens = combine_command_tokens(raw_tokens);
         
         // Post-token-combination
         t_token *combined_token;
