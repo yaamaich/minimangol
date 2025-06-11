@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/24 04:43:16 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/31 19:04:53 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/06/10 20:00:30 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,10 @@ t_node *build_command_tree(t_parser *parser)
 			if (node)
 				ast_push(stack, node);
 			ft_printf("im here2,1\n");
-		}else if (token->type == OP_TOKEN)
+		}else if (token->type == OP_TOKEN || 
+         token->type == REDIR_IN || token->type == REDIR_OUT || 
+         token->type == APPEND || token->type == HEREDOC ||
+         token->type == AND_IF || token->type == OR_IF)
 		{
 			ft_printf("im here3\n");
 			if (ast_stack_size(stack) < 2)

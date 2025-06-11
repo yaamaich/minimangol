@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/24 04:48:26 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/06/02 20:16:33 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/06/06 16:54:43 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,12 +120,12 @@ t_token     *handle_quotes(t_lexer *lexer, char quote_char)
 	return (token);
 }
 
-t_token	*first_token_in_command(t_token *token)
-{
-	if (token->type == CMD)
-		return token;
-	return NULL;
-}
+// t_token	*first_token_in_command(t_token *token)
+// {
+// 	if (token->type == CMD)
+// 		return token;
+// 	return NULL;
+// }
 
 t_token_type    classify_token(t_token *token)
 {

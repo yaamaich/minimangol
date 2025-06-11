@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 13:00:24 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/29 16:20:06 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/06/11 17:10:50 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,14 +77,6 @@ typedef struct s_queue
 	t_queue_node	*tail;
 }				t_queue;
 
-				
-// typedef struct s_node {
-// 	t_token        	*token;
-// 	t_cmd_node      *cmd; 
-// 	int				token_type;
-// 	struct s_node 	*left;
-// 	struct s_node 	*right;
-// } 				t_node;
 
 typedef struct s_cmd_node {
     char            *cmd;
@@ -126,20 +118,13 @@ typedef struct s_redir
 	struct s_redir	*next;
 } 				t_redir;
 
-// typedef struct s_redir_token {
-//     int						type;
-//     char					*file;
-//     struct s_redir_token	*next;
-// } 				t_redir_token;
-
-
-// typedef struct s_cmd_node
-// {
-// 	char				*cmd;
-// 	char				*args;
-// 	t_redir				*redir; 
-// 	struct s_cmd_node	*next;
-// }				t_cmd_node;
+typedef struct s_cmd_node
+{
+	char				*cmd;
+	char				*args;
+	t_redir				*redir; 
+	struct s_cmd_node	*next;
+}				t_cmd_node;
 
 typedef struct s_op_node {
     t_token		*token;
@@ -176,7 +161,6 @@ void finalize_parsing(t_parser *parser);
 t_token *dequeue(t_queue *queue);
 t_node *build_command_tree(t_parser *parser);
 void add_redirection(t_cmd_node *cmd, t_redir *redir);
-// t_cmd_node *creat_command_node(char *cmd, char *args);
 void add_argument(t_cmd_node *cmd, char *arg);
 t_cmd_node *create_command_node(char *cmd, char *first_arg);  // Fixed typo
 t_node *create_operator_node(t_token *token, t_node *left, t_node *right);

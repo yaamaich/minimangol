@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/24 04:40:28 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/06/02 20:18:58 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/06/10 20:09:24 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,15 +17,15 @@
 int precedence(t_token_type type)
 {
 	if (type == OP_TOKEN)
-		return (1);
-	else if (type == AND_IF)
-		return (2);
-	else if (type == OR_IF)
-		return (3);
-	else if (type == REDIR_IN || type == REDIR_OUT)
 		return (4);
+	else if (type == AND_IF)
+		return (1);
+	else if (type == OR_IF)
+		return (1);
+	else if (type == REDIR_IN || type == REDIR_OUT)
+		return (3);
 	else if (type == APPEND || type == HEREDOC)
-		return (5);
+		return (3);
 	else
 		return (0);
 }

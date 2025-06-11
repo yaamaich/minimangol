@@ -6,7 +6,7 @@
 /*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 17:23:49 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/06/02 20:25:03 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/06/10 17:57:14 by yaamaich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,7 +148,7 @@ t_queue *combine_command_tokens(t_queue *tokens)
 		// لو التوكن خاص بإعادة التوجيه أو أنبوب (PIPE, REDIRECTION)
 		else if (token->type == PIPE || token->type == REDIR_OUT || token->type == APPEND /* مثلا */)
 		{
-			// أولاً نضيف الأمر الحالي لو كان كاين
+			// أولاً  نضيف الأمر الحالي لو كان كاين
 			if (command_str)
 			{
 				t_token *cmd_token = create_token(CMD_TOKEN, command_str);
@@ -213,10 +213,15 @@ int main(void) {
         
         combined_tokens = combine_command_tokens(raw_tokens);
         
-        // Post-token-combination
         t_token *combined_token;
         while ((combined_token = dequeue(combined_tokens)))
+        {
+            printf("TYPE: %d, VALUE: %s\n", combined_token->type, combined_token->value);
             process_token(parser, combined_token);
+        }
+
+        // Post-token-combination
+        
             
         // Shunting Yard completion
         finalize_parsing(parser);
