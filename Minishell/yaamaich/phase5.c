@@ -3,33 +3,62 @@
 /*                                                        :::      ::::::::   */
 /*   phase5.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/24 04:46:44 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/27 06:29:46 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/08/28 17:05:55 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 //PAHSE 5//
-int create_heredoc(const char *delimiter)
+// int create_heredoc(const char *delimiter)
+// {
+// 	int fd;
+// 	char *line;
+// 	fd = open(delimiter, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+// 	while (1)
+// 	{
+// 	line = readline("> ");
+//     if (!line || ft_strcmp(line, delimiter) == 0)
+//         break;
+//     write(fd, line, ft_strlen(line));
+//     write(fd, "\n", 1);
+//     free(line);
+// 	}
+// 	lseek(fd, 0, SEEK_SET);
+// 	return (fd);
+// }
+int	create_heredoc(const char *delimiter)
 {
-	int fd;
-	char *line;
-	fd = open(delimiter, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	int		fd;
+	char	*line;
+
+	fd = open( "/tmp/.heredoc_tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (fd < 0)
+		return (perror("open"), -1);
 	while (1)
 	{
-	line = readline("> ");
-    if (!line || ft_strcmp(line, delimiter) == 0)
-        break;
-    write(fd, line, ft_strlen(line));
-    write(fd, "\n", 1);
-    free(line);
+		line = readline("> ");
+		if (!line || ft_strcmp(line, delimiter) == 0)
+		{
+			free(line);
+			break ;
+		}
+		write(fd, line, ft_strlen(line));
+		write(fd, "\n", 1);
+		free(line);
 	}
-	lseek(fd, 0, SEEK_SET);
+	close(fd);
+	fd = open(filename, O_RDONLY);
+	if (fd < 0)
+		return (perror("open"), -1);
+	unlink(filename);
 	return (fd);
 }
+
+
 int handle_redirections(t_cmd_node *cmd)
 {
 	int 	fd;

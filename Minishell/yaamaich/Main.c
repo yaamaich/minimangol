@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/23 17:23:49 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/06/10 17:57:14 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/08/28 04:44:45 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -227,7 +227,7 @@ int main(void) {
         finalize_parsing(parser);
 
         // Print postfix expression for debugging
-        printf("\n--- Postfix Expression ---\n");
+        printf("\n--- Ppostfix Exression ---\n");
         t_queue_node *current = parser->output_queue->head;
         while (current) {
             printf("%s ", current->token->value);

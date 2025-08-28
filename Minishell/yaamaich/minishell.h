@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 13:00:24 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/06/11 17:10:50 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/08/28 03:34:58 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,13 +118,13 @@ typedef struct s_redir
 	struct s_redir	*next;
 } 				t_redir;
 
-typedef struct s_cmd_node
-{
-	char				*cmd;
-	char				*args;
-	t_redir				*redir; 
-	struct s_cmd_node	*next;
-}				t_cmd_node;
+// typedef struct s_cmd_node
+// {
+// 	char				*cmd;
+// 	char				*args;
+// 	t_redir				*redir; 
+// 	struct s_cmd_node	*next;
+// }				t_cmd_node;
 
 typedef struct s_op_node {
     t_token		*token;

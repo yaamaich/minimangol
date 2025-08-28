@@ -1,8 +1,7 @@
 NAME = minishell
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -I libft/include -lreadline -o minishell.a
-
+CFLAGS = -Wall -Wextra -Werror -I libft/include
 
 LIBFT = libft/libft.a 
 
@@ -11,7 +10,7 @@ SRC = Main.c minishell_use.c tools.c phase1.c phase2.c phase3.c phase4.c phase5.
 all: $(NAME)
 
 $(NAME): $(LIBFT) $(SRC)
-	$(CC) $(CFLAGS) $(SRC) $(LIBFT) -o $(NAME)
+	$(CC) $(CFLAGS) $(SRC) $(LIBFT) -lreadline -o $(NAME)
 
 $(LIBFT):
 	make -C libft
@@ -26,4 +25,3 @@ fclean: clean
 re: fclean all
 
 .PHONY: all clean fclean re
-

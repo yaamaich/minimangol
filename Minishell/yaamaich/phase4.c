@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   phase4.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/24 04:44:46 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/30 16:28:10 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/08/28 12:24:16 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,47 +26,85 @@ char *get_env_value(char **env, const char *var_name)
 		while (env[i][j] == var_name[j] && var_name[j] != '\0')
 		{
 			j++;
-			if(var_name == '\0' && env[i][j] == '=')
+			if (var_name[j] == '\0' && env[i][j] == '=')
 				return (&env[i][j + 1]);
 		}
 		i++;
 	}
 	return (NULL);
 }
-
-char *expand_variables(char *str, t_env *env)
+char *expand_variables(char *str, char **env)
 {
-	int i;
-	int start;
-	char *var_name;
-	char *var_value;
-	char *result;
+    int i = 0;
+    int start;
+    char *var_name;
+    char *var_value;
+    char *result = ft_strdup("");
 
-	i = 0;
-	result = "";
-	while(i < ft_strlen(str))
-	{
-		if(str[i] == '$' && i + 1 < ft_strlen(str))
-		{
-			i--;
-			start = i;
-			while (ft_isalphanumiric(str[i]) || str[i] == '_')
-			{
-				i++;
-				var_name = ft_substr(str, start, i - start);
-				var_value = get_env_value(&env->value, var_name);
-				if (var_value != NULL)
-					return (result = ft_strjoin(result, var_value));
-				else
-				{
-					result += str[i];
-					i++;
-				}
-			}
-		}
-	}
-	return result;
+    while (str[i])
+    {
+        if (str[i] == '$' && i + 1 < ft_strlen(str))
+        {
+            i++;
+            start = i;
+
+            
+            while (ft_isalphanumiric(str[i]) || str[i] == '_')
+                i++;
+
+           
+            var_name = ft_substr(str, start, i - start);
+
+           
+            var_value = get_env_value(env, var_name);
+
+            if (var_value)
+                result = ft_strjoin(result, var_value);
+            
+            free(var_name);
+        }
+        else
+        {
+            
+            char tmp[2] = {str[i], '\0'};
+            result = ft_strjoin(result, tmp);
+            i++;
+        }
+    }
+    return result;
 }
+
+// char *expand_variables(char *str, t_env *env)
+// {
+// 	int i;
+// 	int start;
+// 	char *var_name;
+// 	char *var_value;
+// 	char *result;
+
+// 	i = 0;
+// 	result = "";
+// 	while(i < ft_strlen(str))
+// 	{
+// 		if(str[i] == '$' && i + 1 < ft_strlen(str))
+// 		{
+// 			i++;
+// 			start = i;
+// 			while (ft_isalphanumiric(str[i]) || str[i] == '_')
+// 				i++;
+// 			var_name = ft_substr(str, start, i - start);
+// 			var_value = get_env_value(&env->value, var_name);
+// 			if (var_value != NULL)
+// 				return (result = ft_strjoin(result, var_value));
+// 			else
+// 			{
+// 				result += str[i];
+// 				i++;
+// 			}
+// 		}
+// 	}
+// 	return result;
+// }
 
 char *expand_exit_status(char *str, int last_exit_status)
 {

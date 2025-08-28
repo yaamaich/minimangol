@@ -1,0 +1,14 @@
+Main.c
+Makefile
+file.txt
+libft
+minishell
+minishell.h
+minishell_use.c
+output.log
+phase1.c
+phase2.c
+phase3.c
+phase4.c
+phase5.c
+tools.c

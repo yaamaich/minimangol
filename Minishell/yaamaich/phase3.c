@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   phase3.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/24 04:43:16 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/06/10 20:00:30 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/08/28 11:41:36 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,6 @@ t_token *dequeue(t_queue *queue)
 
 t_node *build_command_tree(t_parser *parser)
 {
-	ft_printf("im here\n");
 	t_ast_stack		*stack;
 	t_op_node 		*op_node;
 	t_node 			*new_node; 
@@ -93,29 +92,23 @@ t_node *build_command_tree(t_parser *parser)
 	stack->size = 0;
 	while ((token = dequeue(parser->output_queue)))
 	{
-		ft_printf("im here1\n");
 		 if (!token)  // تحقق احتياطي
 			break;
 		if (token->type == CMD_TOKEN || token->type == WORD_TOKEN)
 		{
-			ft_printf("im here2\n");
 			node = create_tree_node(token);
 			if (node)
 				ast_push(stack, node);
-			ft_printf("im here2,1\n");
 		}else if (token->type == OP_TOKEN || 
          token->type == REDIR_IN || token->type == REDIR_OUT || 
          token->type == APPEND || token->type == HEREDOC ||
          token->type == AND_IF || token->type == OR_IF)
 		{
-			ft_printf("im here3\n");
 			if (ast_stack_size(stack) < 2)
 			{
-				ft_printf("im here4\n");
 				report_mesage("Invalid expression");
 				return NULL;
 			}
-			ft_printf("im here5\n");
 			right = ast_pop(stack);
 			left = ast_pop(stack);
 			if (!left || !right)
@@ -141,7 +134,6 @@ t_node *build_command_tree(t_parser *parser)
 	}
 	if (ast_stack_size(stack) < 1)
 	{
-		ft_printf("bad trip\n");
 		report_mesage("Invalid expression");
 		return (NULL);
 	}
@@ -151,14 +143,19 @@ t_node *build_command_tree(t_parser *parser)
 void add_argument(t_cmd_node *cmd, char *arg)
 {
 	// Reallocate args array to add new argument
-	int new_size = cmd->arg_count + 2; // +1 for new arg, +1 for NULL terminator
+	int new_size;
+	int i;
+	
+	i = 0;
+	new_size = cmd->arg_count + 2; // +1 for new arg, +1 for NULL terminator
 	char **new_args = malloc(sizeof(char *) * new_size);
 	
 	// Copy existing arguments
-	for (int i = 0; i < cmd->arg_count; i++) {
+	while (i < cmd->args_count)
+	{
 		new_args[i] = cmd->args[i];
+		i++;
 	}
-	
 	// Add new argument
 	new_args[cmd->arg_count] = ft_strdup(arg);
 	new_args[cmd->arg_count + 1] = NULL;
@@ -171,7 +168,7 @@ void add_argument(t_cmd_node *cmd, char *arg)
 
 t_cmd_node *create_command_node(char *cmd , char *first_arg)
 {
-	first_arg = "";
+	(void)first_arg;
 	t_cmd_node *node = malloc(sizeof(t_cmd_node));
 	node->cmd = ft_strdup(cmd);
 	node->args = malloc(sizeof(char *) * 2);
@@ -182,21 +179,21 @@ t_cmd_node *create_command_node(char *cmd , char *first_arg)
 	node->next = NULL;
 	return node;
 }
-void add_redirection(t_cmd_node *cmd, t_redir *redir)
-{
-	t_redir *current;
-
-	
-	if (cmd->redir == NULL)
-		cmd->redir = redir;
-	else
+	void add_redirection(t_cmd_node *cmd, t_redir *redir)
 	{
-		current = cmd->redir;
-		while (current->next != NULL)
-			current = current->next;
-		current->next = redir;
+		t_redir *current;
+
+		
+		if (cmd->redir == NULL)
+			cmd->redir = redir;
+		else
+		{
+			current = cmd->redir;
+			while (current->next != NULL)
+				current = current->next;
+			current->next = redir;
+		}
 	}
-}
 
 t_node *connect_commands(t_node *left, t_node *right, t_op_node *op)
 {

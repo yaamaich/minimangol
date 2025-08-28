@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   phase1.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/24 04:48:26 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/06/06 16:54:43 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/08/28 06:56:54 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,40 +39,44 @@ t_token *handle_operator(t_lexer *lexer)
     token->type = classify_token(token);
     return token;
 }
+
 t_token *handle_word(t_lexer *lexer)
 {
     int start = lexer->position;
-    
-    while (lexer->position < lexer->length && !whitespaces(lexer->input[lexer->position]))
+	int i;
+
+    while (lexer->position < lexer->length)
     {
+        char c = lexer->input[lexer->position];
+
+        // stop on whitespace
+        if (whitespaces(c)) break;
+
+        // stop on any operator-ish char so it can be tokenized separately
+        if (c == '|' || c == '<' || c == '>' || c == '(' || c == ')' || c == '&')
+            break;
+
         lexer->position++;
     }
 
-    int word_length = lexer->position - start;
-    if (word_length <= 0)
-        return NULL;
+    int len = lexer->position - start;
+    if (len <= 0) return NULL;
 
-    char *word = malloc(word_length + 1);
-    if (!word)
-        return NULL;
-
-    for (int i = 0; i < word_length; i++)
-        word[i] = lexer->input[start + i];
-    word[word_length] = '\0';
+    char *word = malloc(len + 1);
+   	i = 0;
+	while (i < len)
+	{
+		word[i] = lexer->input[start + i];
+		i++;
+	}
+    word[len] = '\0';
 
     t_token *token = malloc(sizeof(t_token));
-    if (!token)
-    {
-        free(word);
-        return NULL;
-    }
-
-    token->type = CMD_TOKEN;
+    token->type = CMD_TOKEN;          // or WORD_TOKEN; you can refine later
     token->value = word;
     token->quete_type = 0;
     token->pipe_read = -1;
     token->pipe_write = -1;
-
     return token;
 }
 
@@ -119,13 +123,6 @@ t_token     *handle_quotes(t_lexer *lexer, char quote_char)
 
 	return (token);
 }
-
-// t_token	*first_token_in_command(t_token *token)
-// {
-// 	if (token->type == CMD)
-// 		return token;
-// 	return NULL;
-// }
 
 t_token_type    classify_token(t_token *token)
 {
