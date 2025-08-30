@@ -19,8 +19,9 @@
 #include <fcntl.h>
 #include <readline/readline.h>
 #include <readline/history.h>
-# include "libft/src/libft.h"
+#include "libft/src/libft.h"
 
+extern int g_exit_status; 
 
 typedef struct s_lexer
 {
@@ -65,9 +66,17 @@ typedef struct s_stack
 	t_stack_node	*top;
 } 				t_stack;
 
+typedef struct s_cmd_node {
+    char            *cmd;
+    char            **args;       // Changed from char*
+    int             arg_count;    // Added missing field
+    struct s_redir  *redir;
+    struct s_cmd_node *next;
+} t_cmd_node;
 typedef struct s_queue_node
 {
 	t_token					*token;
+	t_cmd_node				*cmd_token;
 	struct s_queue_node		*next;
 }				t_queue_node;
 
@@ -78,13 +87,7 @@ typedef struct s_queue
 }				t_queue;
 
 
-typedef struct s_cmd_node {
-    char            *cmd;
-    char            **args;       // Changed from char*
-    int             arg_count;    // Added missing field
-    struct s_redir  *redir;
-    struct s_cmd_node *next;
-} t_cmd_node;
+
 
 typedef struct s_node {
     t_token         *token;
@@ -153,6 +156,8 @@ t_token	*first_token_in_command(t_token *token);
 int precedence(t_token_type type);
 t_token *create_token(t_token_type type, const char *value);
 void enqueue(t_queue *queue, t_token *token);
+void cmd_enqueue(t_queue *queue, t_cmd_node *token);
+t_cmd_node *cmd_dequeue(t_queue *queue);
 void handle_operators(t_parser *parser, t_token *op_token);
 void process_token(t_parser *parser, t_token *token);
 void finalize_parsing(t_parser *parser);

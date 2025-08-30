@@ -51,10 +51,10 @@ int	create_heredoc(const char *delimiter)
 		free(line);
 	}
 	close(fd);
-	fd = open(filename, O_RDONLY);
+	fd = open("/tmp/.heredoc_tmp", O_RDONLY);
 	if (fd < 0)
 		return (perror("open"), -1);
-	unlink(filename);
+	unlink("/tmp/.heredoc_tmp");
 	return (fd);
 }
 

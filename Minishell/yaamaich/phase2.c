@@ -34,6 +34,7 @@ void enqueue(t_queue *queue, t_token *token)
 	t_queue_node *new_queue;
 
 	new_queue = malloc (sizeof(t_queue_node));
+    new_queue->cmd_token = NULL;
 	new_queue->token = token;
 	new_queue->next = NULL;
 	
@@ -42,6 +43,30 @@ void enqueue(t_queue *queue, t_token *token)
 		queue->head = new_queue;
 		queue->tail = new_queue;
 	}else
+	{
+		queue->tail->next = new_queue;
+		queue->tail = new_queue;
+	}
+}
+void cmd_enqueue(t_queue *queue, t_cmd_node *token)
+{
+	if (!queue || !token)
+		return;
+		
+	t_queue_node *new_queue = malloc(sizeof(t_queue_node));
+	if (!new_queue)
+		return;
+		
+	new_queue->cmd_token = token;
+	new_queue->token = NULL;  // Make sure token field is NULL
+	new_queue->next = NULL;
+	
+	if (queue->head == NULL)
+	{
+		queue->head = new_queue;
+		queue->tail = new_queue;
+	}
+	else
 	{
 		queue->tail->next = new_queue;
 		queue->tail = new_queue;

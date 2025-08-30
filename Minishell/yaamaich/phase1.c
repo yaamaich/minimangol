@@ -17,7 +17,7 @@ t_token *handle_operator(t_lexer *lexer)
     t_token *token;
     char	*input;
     int 	pos;
-
+	
 	input = lexer->input;
 	pos = lexer->position;
     token = malloc(sizeof(t_token));
@@ -37,6 +37,7 @@ t_token *handle_operator(t_lexer *lexer)
         lexer->position += 1;
     }
     token->type = classify_token(token);
+	g_exit_status = 1;
     return token;
 }
 
@@ -72,11 +73,15 @@ t_token *handle_word(t_lexer *lexer)
     word[len] = '\0';
 
     t_token *token = malloc(sizeof(t_token));
-    token->type = CMD_TOKEN;          // or WORD_TOKEN; you can refine later
+	if (g_exit_status)
+    	token->type = CMD_TOKEN;
+	else
+	    token->type = WORD_TOKEN;    // or WORD_TOKEN; you can refine later
     token->value = word;
     token->quete_type = 0;
     token->pipe_read = -1;
     token->pipe_write = -1;
+	g_exit_status = 0;
     return token;
 }
 

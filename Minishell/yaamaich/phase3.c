@@ -73,7 +73,22 @@ t_token *dequeue(t_queue *queue)
 	return (token);
 }
 
+t_cmd_node *cmd_dequeue(t_queue *queue)
+{
+	t_cmd_node *token;
+	t_queue_node *node_to_remove;
+	
+	if (!queue || queue->head == NULL)
+		return NULL;
+	node_to_remove = queue->head;
+	token = node_to_remove->cmd_token;
+	queue->head = node_to_remove->next;
 
+	if (queue->head == NULL)
+		queue->tail = (NULL);
+	free(node_to_remove);
+	return (token);
+}
 
 t_node *build_command_tree(t_parser *parser)
 {
@@ -96,6 +111,7 @@ t_node *build_command_tree(t_parser *parser)
 			break;
 		if (token->type == CMD_TOKEN || token->type == WORD_TOKEN)
 		{
+			
 			node = create_tree_node(token);
 			if (node)
 				ast_push(stack, node);
@@ -151,7 +167,7 @@ void add_argument(t_cmd_node *cmd, char *arg)
 	char **new_args = malloc(sizeof(char *) * new_size);
 	
 	// Copy existing arguments
-	while (i < cmd->args_count)
+	while (i < cmd->arg_count)
 	{
 		new_args[i] = cmd->args[i];
 		i++;
@@ -165,20 +181,60 @@ void add_argument(t_cmd_node *cmd, char *arg)
 	cmd->args = new_args;
 	cmd->arg_count++;
 }
-
-t_cmd_node *create_command_node(char *cmd , char *first_arg)
+t_cmd_node *create_command_node(char *cmd, char *first_arg)
 {
 	(void)first_arg;
+	
+	if (!cmd)
+		return NULL;
+		
 	t_cmd_node *node = malloc(sizeof(t_cmd_node));
+	if (!node)
+		return NULL;
+		
 	node->cmd = ft_strdup(cmd);
+	if (!node->cmd)
+	{
+		free(node);
+		return NULL;
+	}
+	
+	// Allocate space for 2 pointers: command + NULL
 	node->args = malloc(sizeof(char *) * 2);
-	node->args[0] = ft_strdup(cmd);  // First arg is always the command itself
+	if (!node->args)
+	{
+		free(node->cmd);
+		free(node);
+		return NULL;
+	}
+	
+	node->args[0] = ft_strdup(cmd);  // First arg is the command itself
+	if (!node->args[0])
+	{
+		free(node->args);
+		free(node->cmd);
+		free(node);
+		return NULL;
+	}
 	node->args[1] = NULL;
-	node->arg_count = 1;
+	node->arg_count = 1;  // We have 1 argument (the command)
 	node->redir = NULL;
 	node->next = NULL;
 	return node;
 }
+
+// t_cmd_node *create_command_node(char *cmd , char *first_arg)
+// {
+// 	(void)first_arg;
+// 	t_cmd_node *node = malloc(sizeof(t_cmd_node));
+// 	node->cmd = ft_strdup(cmd);
+// 	node->args = malloc(sizeof(char *) * 1);
+// 	node->args[0] = NULL;  // First arg is always the command itself
+// 	node->arg_count = 0;
+// 	node->redir = NULL;
+// 	node->next = NULL;
+// 	return node;
+// }
 	void add_redirection(t_cmd_node *cmd, t_redir *redir)
 	{
 		t_redir *current;
@@ -211,3 +267,4 @@ t_node *connect_commands(t_node *left, t_node *right, t_op_node *op)
 	node->left = left;
 	return (node);
 }
+

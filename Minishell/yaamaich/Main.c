@@ -17,47 +17,31 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-// int main(void) {
-//     char *input;
-//     t_lexer *lexer;
-//     t_parser *parser;
-//     t_token *token;
-//     t_node *ast;
-
-//     while (1) {
-//         input = readline("minishell> ");
-//         if (!input) break;
-//         if (*input) add_history(input);
-
-//         // Initialize lexer and tokenization
-//         lexer = initialize_lexer(input);
-//         parser = initialize_shunting_yard();
-
-//         // Tokenization phase
-//         printf("\n--- Tokenization ---\n");
-//         while ((token = get_next_token(lexer))) {
-//             printf("Token: type=%d, value='%s'\n", token->type, token->value);
-//             process_token(parser, token);
-//         }
-
-//         // Shunting Yard completion
-//         finalize_parsing(parser);
-
-//         // AST construction
-//         printf("\n--- AST Construction ---\n");
-//         ast = build_command_tree(parser);
-//         if (ast) printf("AST built successfully\n");
-
-//         // Cleanup
-//         free(input);
-//         free(lexer);
-        
-//         // Reset for next input
-//         printf("\n--------------------------------\n");
-//     }
-//     return 0;
-// }
-
+int g_exit_status = 1;
+void free_command_node(t_cmd_node *cmd)
+{
+	if (!cmd)
+		return;
+		
+	// Free command string
+	if (cmd->cmd)
+		free(cmd->cmd);
+		
+	// Free arguments array
+	if (cmd->args)
+	{
+		int i = 0;
+		while (i < cmd->arg_count && cmd->args[i])
+		{
+			free(cmd->args[i]);
+			i++;
+		}
+		free(cmd->args);
+	}
+	
+	// Free the node itself
+	free(cmd);
+}
 void print_ast(t_node *node, int depth)
 {
     if (!node) return;
@@ -78,111 +62,43 @@ void print_ast(t_node *node, int depth)
     }
 }
 
-// t_queue *combine_command_tokens(t_queue *tokens)
-// {
-// 	t_queue *combined = creat_empty_queue();
-// 	t_token *token;
-// 	char *command_str = NULL;
-
-// 	while ((token = dequeue(tokens)))
-// 	{
-// 		if (token->type == CMD_TOKEN || token->type == WORD_TOKEN)
-// 		{
-// 			if (!command_str)
-// 				command_str = ft_strdup(token->value);
-// 			else
-// 			{
-// 				char *tmp = command_str;
-// 				command_str = ft_strjoin(tmp, " ");
-// 				free(tmp);
-// 				tmp = command_str;
-// 				command_str = ft_strjoin(tmp, token->value);
-// 				free(tmp);
-// 			}
-// 		}
-// 		else
-// 		{
-// 			if (command_str)
-// 			{
-// 				t_token *cmd_token = create_token(CMD_TOKEN, command_str);
-// 				enqueue(combined, cmd_token);
-// 				free(command_str);
-// 				command_str = NULL;
-// 			}
-// 			enqueue(combined, token);
-// 		}
-// 	}
-
-// 	if (command_str)
-// 	{
-// 		t_token *cmd_token = create_token(CMD_TOKEN, command_str);
-// 		enqueue(combined, cmd_token);
-// 		free(command_str);
-// 	}
-
-// 	return combined;
-// }
-t_queue *combine_command_tokens(t_queue *tokens)
+t_queue *combine_command_tokens_cmd_only(t_queue *tokens)
 {
 	t_queue *combined = creat_empty_queue();
 	t_token *token;
-	char *command_str = NULL;
+	t_cmd_node *command_str = NULL;
 
-	while ((token = dequeue(tokens)))
-	{
-		// لو التوكن هو أمر أو كلمة (معامل)
-		if (token->type == CMD_TOKEN || token->type == WORD_TOKEN)
-		{
-			if (!command_str)
-				command_str = ft_strdup(token->value);
-			else
-			{
-				char *tmp = command_str;
-				command_str = ft_strjoin(tmp, " ");
-				free(tmp);
-				tmp = command_str;
-				command_str = ft_strjoin(tmp, token->value);
-				free(tmp);
-			}
-		}
-		// لو التوكن خاص بإعادة التوجيه أو أنبوب (PIPE, REDIRECTION)
-		else if (token->type == PIPE || token->type == REDIR_OUT || token->type == APPEND /* مثلا */)
-		{
-			// أولاً  نضيف الأمر الحالي لو كان كاين
-			if (command_str)
-			{
-				t_token *cmd_token = create_token(CMD_TOKEN, command_str);
-				enqueue(combined, cmd_token);
-				free(command_str);
-				command_str = NULL;
-			}
-			// ثم نضيف التوكن الخاص بإعادة التوجيه أو الأنبوب كتوكن مستقل
-			enqueue(combined, token);
-		}
-		else
-		{
-			// لو توكن آخر غير معروف، نضيفه مباشرة
-			if (command_str)
-			{
-				t_token *cmd_token = create_token(CMD_TOKEN, command_str);
-				enqueue(combined, cmd_token);
-				free(command_str);
-				command_str = NULL;
-			}
-			enqueue(combined, token);
-		}
+	// If token is a command or word (argument)
+	while ((token = dequeue(tokens))) {
+	    if (token->type == CMD_TOKEN) {
+	        if (command_str) {
+	            cmd_enqueue(combined, command_str);
+	            command_str = NULL;
+	        }
+	        command_str = create_command_node(token->value, NULL);
+	    } else if (token->type == WORD_TOKEN) {
+	        if (command_str)
+	            add_argument(command_str, token->value);
+	        // else: error, argument without command
+	    } else if (token->type == PIPE || token->type == REDIR_OUT || token->type == APPEND) {
+	        if (command_str) {
+	            cmd_enqueue(combined, command_str);
+	            command_str = NULL;
+	        }
+	        enqueue(combined, token);
+	    } else {
+	        if (command_str) {
+	            cmd_enqueue(combined, command_str);
+	            command_str = NULL;
+	        }
+	        enqueue(combined, token);
+	    }
 	}
-
-	if (command_str)
-	{
-		t_token *cmd_token = create_token(CMD_TOKEN, command_str);
-		enqueue(combined, cmd_token);
-		free(command_str);
+	if (command_str) {
+	    cmd_enqueue(combined, command_str);
 	}
-
 	return combined;
 }
-
 
 // Updated main function with better debugging
 int main(void) {
@@ -197,42 +113,43 @@ int main(void) {
         if (!input) break;
         if (*input) add_history(input);
 
-        // Initialize lexer and parser
         lexer = initialize_lexer(input);
         parser = initialize_shunting_yard();
 
-        // Tokenization phase
         printf("\n--- Tokenization ---\n");
         t_queue *raw_tokens = creat_empty_queue();
         while ((token = get_next_token(lexer))) {
             printf("Token: type=%d, value='%s'\n", token->type, token->value);
             enqueue(raw_tokens, token);
         }
-
-        t_queue *combined_tokens;
-        
-        combined_tokens = combine_command_tokens(raw_tokens);
-        
+		g_exit_status = 1;
         t_token *combined_token;
-        while ((combined_token = dequeue(combined_tokens)))
+        while ((combined_token = dequeue(raw_tokens)))
         {
             printf("TYPE: %d, VALUE: %s\n", combined_token->type, combined_token->value);
             process_token(parser, combined_token);
         }
 
-        // Post-token-combination
-        
-            
-        // Shunting Yard completion
         finalize_parsing(parser);
 
-        // Print postfix expression for debugging
-        printf("\n--- Ppostfix Exression ---\n");
-        t_queue_node *current = parser->output_queue->head;
-        while (current) {
-            printf("%s ", current->token->value);
-            current = current->next;
-        }
+        t_queue *combined_tokens = combine_command_tokens_cmd_only(parser->output_queue);
+        
+		parser->output_queue = combined_tokens;
+        printf("\n--- Postfix Expression ---\n");
+		t_queue_node *current = parser->output_queue->head;
+		while (current) {
+		    if (current->cmd_token) {
+				printf("here");
+		        printf("%s ", current->cmd_token->cmd); // Print command
+		        for (int i = 1; i < current->cmd_token->arg_count; i++) {
+		            printf("%s ", current->cmd_token->args[i]); // Print arguments
+		        }
+		    }
+		    if (current->token) {
+		        printf("%s ", current->token->value); // Print operator
+		    }
+		    current = current->next;
+		}
         printf("\n");
 
         // AST construction
@@ -243,11 +160,8 @@ int main(void) {
             print_ast(ast, 0);
         }
 
-        // Cleanup
         free(input);
         free(lexer);
-        
-        // Reset for next input
         printf("\n--------------------------------\n");
     }
     return 0;

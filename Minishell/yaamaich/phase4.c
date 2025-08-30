@@ -33,7 +33,7 @@ char *get_env_value(char **env, const char *var_name)
 	}
 	return (NULL);
 }
-char *expand_variables(char *str, char **env)
+char *expand_variables(char *str, t_env *env)
 {
     int i = 0;
     int start;
@@ -56,7 +56,7 @@ char *expand_variables(char *str, char **env)
             var_name = ft_substr(str, start, i - start);
 
            
-            var_value = get_env_value(env, var_name);
+            var_value = get_env_value(&env->value, var_name);
 
             if (var_value)
                 result = ft_strjoin(result, var_value);
