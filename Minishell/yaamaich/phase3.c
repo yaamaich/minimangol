@@ -95,7 +95,7 @@ t_node *build_command_tree(t_parser *parser)
 	t_ast_stack		*stack;
 	t_op_node 		*op_node;
 	t_node 			*new_node; 
-	t_token 		*token;
+	t_queue_node	*cmd;
 	t_node			*node;
 	t_node			*left;
 	t_node			*right;
@@ -105,20 +105,20 @@ t_node *build_command_tree(t_parser *parser)
 		return NULL;
 	stack->top = NULL;
 	stack->size = 0;
-	while ((token = dequeue(parser->output_queue)))
+	cmd = parser->output_queue->head;
+	while (cmd)
 	{
-		 if (!token)  // تحقق احتياطي
-			break;
-		if (token->type == CMD_TOKEN || token->type == WORD_TOKEN)
+		
+
+		if (cmd && cmd->cmd_token && cmd->cmd_token->cmd)
 		{
-			
-			node = create_tree_node(token);
+			node = create_tree_node( cmd->cmd_token);
 			if (node)
 				ast_push(stack, node);
-		}else if (token->type == OP_TOKEN || 
-         token->type == REDIR_IN || token->type == REDIR_OUT || 
-         token->type == APPEND || token->type == HEREDOC ||
-         token->type == AND_IF || token->type == OR_IF)
+		}else if (cmd->token->type == OP_TOKEN || 
+         cmd->token->type == REDIR_IN || cmd->token->type == REDIR_OUT || 
+         cmd->token->type == APPEND || cmd->token->type == HEREDOC ||
+         cmd->token->type == AND_IF || cmd->token->type == OR_IF)
 		{
 			if (ast_stack_size(stack) < 2)
 			{
@@ -133,7 +133,7 @@ t_node *build_command_tree(t_parser *parser)
 				return NULL;
 			}
 			// node = create_operator_node(token, left, right);
-			op_node = create_op_node(token);
+			op_node = create_op_node(cmd->token);
 			if (!op_node || !op_node->token)
 			{
 				report_mesage("Invalid operator node");
@@ -147,6 +147,7 @@ t_node *build_command_tree(t_parser *parser)
 			}
 			ast_push(stack, new_node);
 		}
+		cmd = cmd->next;
 	}
 	if (ast_stack_size(stack) < 1)
 	{

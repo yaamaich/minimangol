@@ -42,19 +42,23 @@ void free_command_node(t_cmd_node *cmd)
 	// Free the node itself
 	free(cmd);
 }
-void print_ast(t_node *node, int depth)
-{
+void print_ast(t_node *node, int depth) {
     if (!node) return;
-    
     for (int i = 0; i < depth; i++) printf("  ");
-    printf("Node: type=%d, value='%s'\n", node->token->type, node->token->value);
-    
+    if (node->cmd) {
+        printf("CMD: %s", node->cmd->cmd);
+        for (int i = 1; i < node->cmd->arg_count; i++) {
+            printf(" ARG: %s", node->cmd->args[i]);
+        }
+        printf("\n");
+    } else if (node->token) {
+        printf("OP: %s\n", node->token->value);
+    }
     if (node->left) {
         for (int i = 0; i < depth; i++) printf("  ");
         printf("├─ Left:\n");
         print_ast(node->left, depth + 1);
     }
-    
     if (node->right) {
         for (int i = 0; i < depth; i++) printf("  ");
         printf("└─ Right:\n");
@@ -139,7 +143,6 @@ int main(void) {
 		t_queue_node *current = parser->output_queue->head;
 		while (current) {
 		    if (current->cmd_token) {
-				printf("here");
 		        printf("%s ", current->cmd_token->cmd); // Print command
 		        for (int i = 1; i < current->cmd_token->arg_count; i++) {
 		            printf("%s ", current->cmd_token->args[i]); // Print arguments
@@ -154,6 +157,7 @@ int main(void) {
 
         // AST construction
         printf("\n--- AST Construction ---\n");
+		 
         ast = build_command_tree(parser);
         if (ast) {
             printf("AST built successfully\n");

@@ -164,6 +164,7 @@ void finalize_parsing(t_parser *parser);
 
 //phase3//
 t_token *dequeue(t_queue *queue);
+t_node *create_tree_node(t_cmd_node *token);
 t_node *build_command_tree(t_parser *parser);
 void add_redirection(t_cmd_node *cmd, t_redir *redir);
 void add_argument(t_cmd_node *cmd, char *arg);
@@ -191,7 +192,6 @@ void report_mesage (char *str);
 t_queue *creat_empty_queue(void);
 t_lexer *initialize_lexer(char *string);
 t_parser *initialize_shunting_yard(void);
-t_node *create_tree_node(t_token *token);
 t_node *create_operator_node(t_token *token, t_node *left, t_node *right);
 
 //minishell_use//

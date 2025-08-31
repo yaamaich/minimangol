@@ -82,11 +82,12 @@ t_parser *initialize_shunting_yard(void)
 }
 
 //phase 3 // 
-
-t_node *create_tree_node(t_token *token)
-{
+t_node *create_tree_node(t_cmd_node *cmd_node) {
     t_node *node = malloc(sizeof(t_node));
-    node->token = token;
+    if (!node) return NULL;
+    node->token = NULL;
+    node->token_type = CMD_TOKEN;
+    node->cmd = cmd_node; // Store the command node here!
     node->left = NULL;
     node->right = NULL;
     return node;
