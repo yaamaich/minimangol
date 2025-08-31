@@ -45,14 +45,16 @@ void free_command_node(t_cmd_node *cmd)
 void print_ast(t_node *node, int depth) {
     if (!node) return;
     for (int i = 0; i < depth; i++) printf("  ");
-    if (node->cmd) {
+    if (node->cmd && node->cmd->cmd) {
         printf("CMD: %s", node->cmd->cmd);
         for (int i = 1; i < node->cmd->arg_count; i++) {
             printf(" ARG: %s", node->cmd->args[i]);
         }
         printf("\n");
-    } else if (node->token) {
+    } else if (node->token && node->token->value) {
         printf("OP: %s\n", node->token->value);
+    } else {
+        printf("UNKNOWN NODE\n");
     }
     if (node->left) {
         for (int i = 0; i < depth; i++) printf("  ");
