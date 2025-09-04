@@ -13,53 +13,80 @@
 #include "minishell.h"
 
 //PAHSE 5//
-// int create_heredoc(const char *delimiter)
-// {
-// 	int fd;
-// 	char *line;
-// 	fd = open(delimiter, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-// 	while (1)
-// 	{
-// 	line = readline("> ");
-//     if (!line || ft_strcmp(line, delimiter) == 0)
-//         break;
-//     write(fd, line, ft_strlen(line));
-//     write(fd, "\n", 1);
-//     free(line);
-// 	}
-// 	lseek(fd, 0, SEEK_SET);
-// 	return (fd);
-// }
-int	create_heredoc(const char *delimiter)
-{
-	int		fd;
-	char	*line;
 
-	fd = open( "/tmp/.heredoc_tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (fd < 0)
-		return (perror("open"), -1);
-	while (1)
-	{
-		line = readline("> ");
-		if (!line || ft_strcmp(line, delimiter) == 0)
-		{
-			free(line);
-			break ;
-		}
-		write(fd, line, ft_strlen(line));
-		write(fd, "\n", 1);
-		free(line);
-	}
-	close(fd);
-	fd = open("/tmp/.heredoc_tmp", O_RDONLY);
-	if (fd < 0)
-		return (perror("open"), -1);
-	unlink("/tmp/.heredoc_tmp");
-	return (fd);
+
+int delimiter_is_quoted(const char *delimiter)
+{
+    if (!delimiter)
+        return 0;
+    if ((delimiter[0] == '"' && delimiter[strlen(delimiter)-1] == '"') ||
+        (delimiter[0] == '\'' && delimiter[strlen(delimiter)-1] == '\''))
+        return 1;
+    return 0;
+}
+
+char *handle_quote(const char *quote)
+{
+    if (!quote)
+        return NULL;
+    size_t len = strlen(quote);
+    if (len < 2)
+        return ft_strdup(""); // string vide
+    char *content = malloc(len - 1); // -2 quotes + 1 null
+    if (!content)
+        return NULL;
+    ft_strncpy(content, (char *)quote + 1, len - 2);
+    content[len - 2] = '\0';
+    return content;
+}
+int create_heredoc(const char *delimiter, t_env *env)
+{
+    int   fd;
+    char  *line;
+    int   quoted;
+    char  *clean_delim;
+
+    quoted = delimiter_is_quoted(delimiter);
+    if (quoted)
+        clean_delim = handle_quote(delimiter);
+    else
+        clean_delim = ft_strdup(delimiter);
+
+    fd = open("/tmp/.heredoc_tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd < 0)
+        return (perror("open"), -1);
+
+    while (1)
+    {
+        line = readline("> ");
+        if (!line || ft_strcmp(line, clean_delim) == 0)
+        {
+            free(line);
+            break ;
+        }
+        if (!quoted)
+        {
+            char *expanded = expand_variables(line, env);
+            free(line);
+            line = expanded;
+        }
+        write(fd, line, ft_strlen(line));
+        write(fd, "\n", 1);
+        free(line);
+    }
+    free(clean_delim);
+    close(fd);
+
+    fd = open("/tmp/.heredoc_tmp", O_RDONLY);
+    if (fd < 0)
+        return (perror("open"), -1);
+    unlink("/tmp/.heredoc_tmp");
+    return (fd);
 }
 
 
-int handle_redirections(t_cmd_node *cmd)
+
+int handle_redirections(t_cmd_node *cmd, t_env *env)
 {
 	int 	fd;
 	t_redir *redir;
@@ -75,7 +102,7 @@ int handle_redirections(t_cmd_node *cmd)
 		else if (redir->type == APPEND)
 			fd = open(redir->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
 		else if (redir->type == HEREDOC)
-			fd = create_heredoc(redir->filename);  // أو اسم آخر
+			fd = create_heredoc(redir->filename, env);  // أو اسم آخر
 
 		if (fd < 0)
 		{

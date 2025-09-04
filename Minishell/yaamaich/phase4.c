@@ -46,16 +46,10 @@ char *expand_variables(char *str, t_env *env)
         if (str[i] == '$' && i + 1 < ft_strlen(str))
         {
             i++;
-            start = i;
-
-            
+            start = i;  
             while (ft_isalphanumiric(str[i]) || str[i] == '_')
                 i++;
-
-           
             var_name = ft_substr(str, start, i - start);
-
-           
             var_value = get_env_value(&env->value, var_name);
 
             if (var_value)
@@ -65,7 +59,6 @@ char *expand_variables(char *str, t_env *env)
         }
         else
         {
-            
             char tmp[2] = {str[i], '\0'};
             result = ft_strjoin(result, tmp);
             i++;
@@ -73,38 +66,6 @@ char *expand_variables(char *str, t_env *env)
     }
     return result;
 }
-
-// char *expand_variables(char *str, t_env *env)
-// {
-// 	int i;
-// 	int start;
-// 	char *var_name;
-// 	char *var_value;
-// 	char *result;
-
-// 	i = 0;
-// 	result = "";
-// 	while(i < ft_strlen(str))
-// 	{
-// 		if(str[i] == '$' && i + 1 < ft_strlen(str))
-// 		{
-// 			i++;
-// 			start = i;
-// 			while (ft_isalphanumiric(str[i]) || str[i] == '_')
-// 				i++;
-// 			var_name = ft_substr(str, start, i - start);
-// 			var_value = get_env_value(&env->value, var_name);
-// 			if (var_value != NULL)
-// 				return (result = ft_strjoin(result, var_value));
-// 			else
-// 			{
-// 				result += str[i];
-// 				i++;
-// 			}
-// 		}
-// 	}
-// 	return result;
-// }
 
 char *expand_exit_status(char *str, int last_exit_status)
 {

@@ -47,14 +47,27 @@ void print_ast(t_node *node, int depth) {
     for (int i = 0; i < depth; i++) printf("  ");
     if (node->cmd && node->cmd->cmd) {
         printf("CMD: %s", node->cmd->cmd);
-        for (int i = 1; i < node->cmd->arg_count; i++) {
+        for (int i = 0; i < node->cmd->arg_count; i++) {
             printf(" ARG: %s", node->cmd->args[i]);
         }
         printf("\n");
     } else if (node->token && node->token->value) {
-        printf("OP: %s\n", node->token->value);
-    } else {
-        printf("UNKNOWN NODE\n");
+        if ((node->token->type == REDIR_OUT ||
+             node->token->type == REDIR_IN ||
+             node->token->type == HEREDOC ||
+             node->token->type == APPEND) &&
+            node->right && node->right->cmd)
+        {
+            t_redir *r = node->right->cmd->redir;
+            while (r)
+            {
+                printf("OP: %s ", node->token->value);
+                printf("filenime: %s\n ", r->filename);
+                r = r->next;
+            }
+        } else {
+            printf("OP: %s\n", node->token->value);
+        }
     }
     if (node->left) {
         for (int i = 0; i < depth; i++) printf("  ");
@@ -135,9 +148,7 @@ int main(void) {
             printf("TYPE: %d, VALUE: %s\n", combined_token->type, combined_token->value);
             process_token(parser, combined_token);
         }
-
         finalize_parsing(parser);
-
         t_queue *combined_tokens = combine_command_tokens_cmd_only(parser->output_queue);
         
 		parser->output_queue = combined_tokens;
@@ -146,7 +157,7 @@ int main(void) {
 		while (current) {
 		    if (current->cmd_token) {
 		        printf("%s ", current->cmd_token->cmd); // Print command
-		        for (int i = 1; i < current->cmd_token->arg_count; i++) {
+		        for (int i = 0; i < current->cmd_token->arg_count; i++) {
 		            printf("%s ", current->cmd_token->args[i]); // Print arguments
 		        }
 		    }
@@ -165,7 +176,6 @@ int main(void) {
             printf("AST built successfully\n");
             print_ast(ast, 0);
         }
-
         free(input);
         free(lexer);
         printf("\n--------------------------------\n");

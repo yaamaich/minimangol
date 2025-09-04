@@ -68,11 +68,12 @@ typedef struct s_stack
 
 typedef struct s_cmd_node {
     char            *cmd;
-    char            **args;       // Changed from char*
-    int             arg_count;    // Added missing field
-    struct s_redir  *redir;
+    char            **args;      	// Changed from char*
+    int             arg_count;    	// Added missing field
+    struct s_redir  *redir;			// Forward References with Pointers
     struct s_cmd_node *next;
 } t_cmd_node;
+
 typedef struct s_queue_node
 {
 	t_token					*token;
@@ -85,9 +86,6 @@ typedef struct s_queue
 	t_queue_node	*head;
 	t_queue_node	*tail;
 }				t_queue;
-
-
-
 
 typedef struct s_node {
     t_token         *token;
@@ -120,14 +118,6 @@ typedef struct s_redir
 	char			*filename;
 	struct s_redir	*next;
 } 				t_redir;
-
-// typedef struct s_cmd_node
-// {
-// 	char				*cmd;
-// 	char				*args;
-// 	t_redir				*redir; 
-// 	struct s_cmd_node	*next;
-// }				t_cmd_node;
 
 typedef struct s_op_node {
     t_token		*token;
@@ -164,10 +154,12 @@ void finalize_parsing(t_parser *parser);
 
 //phase3//
 t_token *dequeue(t_queue *queue);
+t_redir *create_redir(t_token_type type, char *filename);
 t_node *create_tree_node(t_cmd_node *token);
 t_node *build_command_tree(t_parser *parser);
 void add_redirection(t_cmd_node *cmd, t_redir *redir);
 void add_argument(t_cmd_node *cmd, char *arg);
+void handle_redir(t_node *node, t_token_type type);
 t_cmd_node *create_command_node(char *cmd, char *first_arg);  // Fixed typo
 t_node *create_operator_node(t_token *token, t_node *left, t_node *right);
 int is_operator(t_token_type type); 
@@ -181,9 +173,11 @@ char *expand_exit_status(char *str, int last_exit_status);
 
 
 //phase5//
-int create_heredoc(const char *delimiter);
-int handle_redirections(t_cmd_node *cmd);
+int create_heredoc(const char *delimiter, t_env *env);
+int handle_redirections(t_cmd_node *cmd, t_env *env);
 int setup_pipes(t_node *cmd_tree);
+int delimiter_is_quoted(const char *delimiter);
+char *handle_quote(const char *quote);
 
 //tools//
 int whitespaces(char str);

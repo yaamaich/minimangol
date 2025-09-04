@@ -45,17 +45,6 @@ t_op_node *create_op_node(t_token *token)
 	return op_node;
 }
 
-// t_node *create_operator_node(t_token *token, t_node *left, t_node *right)
-// {
-//     t_node *node = malloc(sizeof(t_node));
-//     node->token = token;
-//     node->left = left;
-//     node->right = right;
-//     return node;
-// }
-
-
-
 t_token *dequeue(t_queue *queue)
 {
 	t_token *token;
@@ -89,7 +78,12 @@ t_cmd_node *cmd_dequeue(t_queue *queue)
 	free(node_to_remove);
 	return (token);
 }
-
+void handle_redir(t_node *node, t_token_type type)
+{
+        t_redir *redir = create_redir(type, node->cmd->cmd);
+        // Attach redir to current command node here!
+        add_redirection(node->cmd, redir); // You need to track current_cmd_node
+}
 t_node *build_command_tree(t_parser *parser)
 {
 	t_ast_stack		*stack;
@@ -108,8 +102,6 @@ t_node *build_command_tree(t_parser *parser)
 	cmd = parser->output_queue->head;
 	while (cmd)
 	{
-		
-
 		if (cmd && cmd->cmd_token && cmd->cmd_token->cmd)
 		{
 			node = create_tree_node( cmd->cmd_token);
@@ -127,12 +119,16 @@ t_node *build_command_tree(t_parser *parser)
 			}
 			right = ast_pop(stack);
 			left = ast_pop(stack);
+			if ( cmd->token->type == REDIR_IN || cmd->token->type == REDIR_OUT || 
+			  cmd->token->type == APPEND || cmd->token->type == HEREDOC )
+			{
+				handle_redir(right, cmd->token->type);
+			}
 			if (!left || !right)
 			{
 				report_mesage("Invalid AST pop");
 				return NULL;
 			}
-			// node = create_operator_node(token, left, right);
 			op_node = create_op_node(cmd->token);
 			if (!op_node || !op_node->token)
 			{
@@ -185,21 +181,17 @@ void add_argument(t_cmd_node *cmd, char *arg)
 t_cmd_node *create_command_node(char *cmd, char *first_arg)
 {
 	(void)first_arg;
-	
 	if (!cmd)
 		return NULL;
-		
 	t_cmd_node *node = malloc(sizeof(t_cmd_node));
 	if (!node)
 		return NULL;
-		
 	node->cmd = ft_strdup(cmd);
 	if (!node->cmd)
 	{
 		free(node);
 		return NULL;
 	}
-	
 	// Allocate space for 2 pointers: command + NULL
 	node->args = malloc(sizeof(char *) * 2);
 	if (!node->args)
@@ -208,49 +200,37 @@ t_cmd_node *create_command_node(char *cmd, char *first_arg)
 		free(node);
 		return NULL;
 	}
-	
-	node->args[0] = ft_strdup(cmd);  // First arg is the command itself
-	if (!node->args[0])
-	{
-		free(node->args);
-		free(node->cmd);
-		free(node);
-		return NULL;
-	}
+	node->args[0] = NULL;
 	node->args[1] = NULL;
-	node->arg_count = 1;  // We have 1 argument (the command)
+	node->arg_count = 0;  // We have 1 argument (the command)
 	node->redir = NULL;
 	node->next = NULL;
 	return node;
 }
+t_redir *create_redir(t_token_type type, char *filename)
+{
+    t_redir *redir = malloc(sizeof(t_redir));
+    if (!redir) return NULL;
+    redir->type = type;
+    redir->filename = ft_strdup(filename);
+    redir->next = NULL;
+    return redir;
+}
 
-// t_cmd_node *create_command_node(char *cmd , char *first_arg)
-// {
-// 	(void)first_arg;
-// 	t_cmd_node *node = malloc(sizeof(t_cmd_node));
-// 	node->cmd = ft_strdup(cmd);
-// 	node->args = malloc(sizeof(char *) * 1);
-// 	node->args[0] = NULL;  // First arg is always the command itself
-// 	node->arg_count = 0;
-// 	node->redir = NULL;
-// 	node->next = NULL;
-// 	return node;
-// }
-	void add_redirection(t_cmd_node *cmd, t_redir *redir)
+void add_redirection(t_cmd_node *cmd, t_redir *redir)
+{
+	t_redir *current;
+	
+	if (cmd->redir == NULL)
+		cmd->redir = redir;
+	else
 	{
-		t_redir *current;
-
-		
-		if (cmd->redir == NULL)
-			cmd->redir = redir;
-		else
-		{
-			current = cmd->redir;
-			while (current->next != NULL)
-				current = current->next;
-			current->next = redir;
-		}
+		current = cmd->redir;
+		while (current->next != NULL)
+			current = current->next;
+		current->next = redir;
 	}
+}
 
 t_node *connect_commands(t_node *left, t_node *right, t_op_node *op)
 {
@@ -263,9 +243,15 @@ t_node *connect_commands(t_node *left, t_node *right, t_op_node *op)
 	if (!node)
 		return NULL;
 	node->token = op->token;
-	node->token_type = OP_TOKEN;
+	node->token_type = op->type;
 	node->right = right;
 	node->left = left;
+
+	if (op->type == REDIR_OUT || op->type == REDIR_IN || op->type == APPEND || op->type == HEREDOC)
+	{
+    	if (left->cmd && right->cmd)
+        	add_redirection(left->cmd, right->cmd->redir);
+    }
 	return (node);
 }
 

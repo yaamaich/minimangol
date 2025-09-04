@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/26 00:52:26 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/08/28 03:39:45 by marvin           ###   ########.fr       */
+/*   Updated: 2025/09/01 08:38:26 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ void				*ft_memchr(const void *str, int c, size_t n);
 int					ft_memcmp(const void *s1, const void *s2, size_t n);
 char				*ft_strnstr(const char *str1, const char *str2, size_t len);
 size_t				ft_strlcpy(char *dst, const char *src, size_t size);
+char	*ft_strncpy(char *dest, char *src, unsigned int n);
 int					ft_atoi(const char *str);
 char				*ft_strdup(const char *s1);
 size_t				ft_strlcat(char *dst, const char *src, size_t dstsize);
