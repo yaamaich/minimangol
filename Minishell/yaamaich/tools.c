@@ -78,6 +78,7 @@ t_parser *initialize_shunting_yard(void)
 	parser = malloc(sizeof(t_parser));
 	parser->op_stack = creat_empty_stack();
 	parser->output_queue = creat_empty_queue();
+    parser->rider = NULL;
 	return (parser);
 }
 

@@ -108,6 +108,7 @@ typedef struct {
 typedef struct s_parser
 {
 	t_stack  *op_stack;
+	t_token		*rider;
 	t_ast_stack *stack;
 	t_queue  *output_queue;
 }				t_parser;
