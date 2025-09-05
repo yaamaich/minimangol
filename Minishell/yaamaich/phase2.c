@@ -14,66 +14,6 @@
 
 //PHASE 2//
 
-int precedence(t_token_type type)
-{
-    if (type == REDIR_IN || type == REDIR_OUT)       // < or >
-    return 4;
-    else if (type == APPEND || type == HEREDOC)     // >> or <<
-    return 4;
-    else if (type == OP_TOKEN)                      // |
-    return 3;
-    else if (type == AND_IF || type == OR_IF)       // && or ||
-    return 1;
-    else
-    return 0;
-}
-
-
-
-void enqueue(t_queue *queue, t_token *token)
-{
-    t_queue_node *new_queue;
-    
-	new_queue = malloc (sizeof(t_queue_node));
-    new_queue->cmd_token = NULL;
-	new_queue->token = token;
-	new_queue->next = NULL;
-	
-	if (queue->head == NULL)
-	{
-        queue->head = new_queue;
-		queue->tail = new_queue;
-	}else
-	{
-        queue->tail->next = new_queue;
-		queue->tail = new_queue;
-	}
-}
-void cmd_enqueue(t_queue *queue, t_cmd_node *token)
-{
-    if (!queue || !token)
-    return;
-    
-	t_queue_node *new_queue = malloc(sizeof(t_queue_node));
-	if (!new_queue)
-    return;
-    
-	new_queue->cmd_token = token;
-	new_queue->token = NULL;  // Make sure token field is NULL
-	new_queue->next = NULL;
-	
-	if (queue->head == NULL)
-	{
-        queue->head = new_queue;
-		queue->tail = new_queue;
-	}
-	else
-	{
-        queue->tail->next = new_queue;
-		queue->tail = new_queue;
-	}
-}
-
 void handl_word(t_parser *parser, t_token *token)
 {
     if (parser->rider)
@@ -88,7 +28,6 @@ void handl_word(t_parser *parser, t_token *token)
         parser->rider = NULL;
     }else
         enqueue(parser->output_queue, token);
-
 }
 void handle_operators(t_parser *parser, t_token *op_token)
 {
@@ -117,39 +56,29 @@ void process_token(t_parser *parser, t_token *token)
 {
     if (token->type == CMD_TOKEN || token->type == WORD_TOKEN)
     {
-
         handl_word(parser, token);
-        return;
-    }
-    if (token->type == OP_TOKEN || token->type == REDIR_IN || token->type == REDIR_OUT
-     || token->type == APPEND  || token->type == HEREDOC
+    } else if (token->type == OP_TOKEN || token->type == REDIR_IN || token->type == REDIR_OUT
+     || token->type == APPEND  || token->type == HEREDOC 
      || token->type == AND_IF  || token->type == OR_IF)
     {
         handle_operators(parser, token);
-        return;
-    }
-    if (token->type == L_PAREN_TOKEN)
+    }else if (token->type == L_PAREN_TOKEN)
     {
         push_stack(&parser->op_stack, token);
-        return;
-    }
-    if (token->type == R_PAREN_TOKEN)
+    } else if (token->type == R_PAREN_TOKEN)
     {
-        while (!is_empty(parser->op_stack)
-            && top_stack(parser->op_stack)->token->type != L_PAREN_TOKEN)
+        while (!is_empty(parser->op_stack) && top_stack(parser->op_stack)->token->type != L_PAREN_TOKEN)
         {
             t_token *op = pop_stack(&parser->op_stack);
             enqueue(parser->output_queue, op);
         }
         if (is_empty(parser->op_stack))
         {
-            report_mesage("Mismatched parentheses\n");
-            return; // nothing to pop
+            report_mesage("Mismatched parentheses\n"); return;
         }
         pop_stack(&parser->op_stack);
-        return;
     }
-    enqueue(parser->output_queue, token);
+    return ;
 }
 void finalize_parsing(t_parser *parser)
 {

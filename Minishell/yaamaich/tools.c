@@ -13,7 +13,6 @@
 #include "minishell.h"
 
 //phase 1 // 
-
 void report_mesage (char *str)
 {
 	ft_printf("%s", str);
@@ -52,13 +51,12 @@ t_token *create_token(t_token_type type, const char *value)
 
     token->type = type;
     token->value = ft_strdup(value);
-    token->quete_type = 0;    // بشكل افتراضي لا يوجد اقتباس
-    token->pipe_read = -1;    // افتراضياً لا يوجد اتصال أنبوب قراءة
-    token->pipe_write = -1;   // افتراضياً لا يوجد اتصال أنبوب كتابة
+    token->quete_type = 0;
+    token->pipe_read = -1;
+    token->pipe_write = -1;
 
     return token;
 }
-
 t_queue *creat_empty_queue(void)
 {
     t_queue *queue;
@@ -70,7 +68,6 @@ t_queue *creat_empty_queue(void)
     queue->tail = NULL;
     return (queue);
 }
-
 t_parser *initialize_shunting_yard(void)
 {
 	t_parser *parser;
@@ -81,7 +78,62 @@ t_parser *initialize_shunting_yard(void)
     parser->rider = NULL;
 	return (parser);
 }
-
+int precedence(t_token_type type)
+{
+    if (type == REDIR_IN || type == REDIR_OUT)       // < or >
+    return 4;
+    else if (type == APPEND || type == HEREDOC)     // >> or <<
+    return 4;
+    else if (type == OP_TOKEN)                      // |
+    return 3;
+    else if (type == AND_IF || type == OR_IF)       // && or ||
+    return 1;
+    else
+    return 0;
+}
+void enqueue(t_queue *queue, t_token *token)
+{
+    t_queue_node *new_queue;
+    
+	new_queue = malloc (sizeof(t_queue_node));
+    new_queue->cmd_token = NULL;
+	new_queue->token = token;
+	new_queue->next = NULL;
+	
+	if (queue->head == NULL)
+	{
+        queue->head = new_queue;
+		queue->tail = new_queue;
+	}else
+	{
+        queue->tail->next = new_queue;
+		queue->tail = new_queue;
+	}
+}
+void cmd_enqueue(t_queue *queue, t_cmd_node *token)
+{
+    if (!queue || !token)
+    return;
+    
+	t_queue_node *new_queue = malloc(sizeof(t_queue_node));
+	if (!new_queue)
+    return;
+    
+	new_queue->cmd_token = token;
+	new_queue->token = NULL;  // Make sure token field is NULL
+	new_queue->next = NULL;
+	
+	if (queue->head == NULL)
+	{
+        queue->head = new_queue;
+		queue->tail = new_queue;
+	}
+	else
+	{
+        queue->tail->next = new_queue;
+		queue->tail = new_queue;
+	}
+}
 //phase 3 // 
 t_node *create_tree_node(t_cmd_node *cmd_node) {
     t_node *node = malloc(sizeof(t_node));

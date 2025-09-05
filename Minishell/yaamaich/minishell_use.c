@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell_use.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yaamaich <yaamaich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 20:26:42 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/05/29 15:58:55 by yaamaich         ###   ########.fr       */
+/*   Updated: 2025/09/05 20:56:45 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,4 +106,3 @@ t_node *ast_pop(t_ast_stack *stack) {
 int ast_stack_size(t_ast_stack *stack) {
 	return stack->size;
 }
-
