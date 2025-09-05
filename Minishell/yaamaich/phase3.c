@@ -84,6 +84,7 @@ void handle_redir(t_node *node, t_token_type type)
         // Attach redir to current command node here!
         add_redirection(node->cmd, redir); // You need to track current_cmd_node
 }
+
 t_node *build_command_tree(t_parser *parser)
 {
 	t_ast_stack		*stack;
@@ -107,10 +108,10 @@ t_node *build_command_tree(t_parser *parser)
 			node = create_tree_node( cmd->cmd_token);
 			if (node)
 				ast_push(stack, node);
-		}else if (cmd->token->type == OP_TOKEN || 
-         cmd->token->type == REDIR_IN || cmd->token->type == REDIR_OUT || 
-         cmd->token->type == APPEND || cmd->token->type == HEREDOC ||
-         cmd->token->type == AND_IF || cmd->token->type == OR_IF)
+		}else if (cmd->token->type == OP_TOKEN ||
+		 cmd->token->type == REDIR_IN || cmd->token->type == REDIR_OUT ||
+		 cmd->token->type == APPEND || cmd->token->type == HEREDOC ||
+		 cmd->token->type == AND_IF || cmd->token->type == OR_IF)
 		{
 			if (ast_stack_size(stack) < 2)
 			{
@@ -121,9 +122,7 @@ t_node *build_command_tree(t_parser *parser)
 			left = ast_pop(stack);
 			if ( cmd->token->type == REDIR_IN || cmd->token->type == REDIR_OUT || 
 			  cmd->token->type == APPEND || cmd->token->type == HEREDOC )
-			{
 				handle_redir(right, cmd->token->type);
-			}
 			if (!left || !right)
 			{
 				report_mesage("Invalid AST pop");
@@ -178,9 +177,8 @@ void add_argument(t_cmd_node *cmd, char *arg)
 	cmd->args = new_args;
 	cmd->arg_count++;
 }
-t_cmd_node *create_command_node(char *cmd, char *first_arg)
+t_cmd_node *create_command_node(char *cmd)
 {
-	(void)first_arg;
 	if (!cmd)
 		return NULL;
 	t_cmd_node *node = malloc(sizeof(t_cmd_node));

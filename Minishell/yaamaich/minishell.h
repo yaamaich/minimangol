@@ -163,7 +163,7 @@ void add_argument(t_cmd_node *cmd, char *arg);
 void add_redirection(t_cmd_node *cmd, t_redir *redir);
 void handle_redir(t_node *node, t_token_type type);
 t_redir *create_redir(t_token_type type, char *filename);
-t_cmd_node *create_command_node(char *cmd, char *first_arg);  // Fixed typo
+t_cmd_node *create_command_node(char *cmd);  // Fixed typo
 t_node *connect_commands(t_node *left, t_node *right, t_op_node *op);
 t_node *create_operator_node(t_token *token, t_node *left, t_node *right);
 

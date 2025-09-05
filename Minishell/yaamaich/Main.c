@@ -94,7 +94,7 @@ t_queue *combine_command_tokens_cmd_only(t_queue *tokens)
 	            cmd_enqueue(combined, command_str);
 	            command_str = NULL;
 	        }
-	        command_str = create_command_node(token->value, NULL);
+	        command_str = create_command_node(token->value);
 	    } else if (token->type == WORD_TOKEN) {
 	        if (command_str)
 	            add_argument(command_str, token->value);
@@ -113,9 +113,8 @@ t_queue *combine_command_tokens_cmd_only(t_queue *tokens)
 	        enqueue(combined, token);
 	    }
 	}
-	if (command_str) {
+	if (command_str)
 	    cmd_enqueue(combined, command_str);
-	}
 	return combined;
 }
 
