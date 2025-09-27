@@ -200,4 +200,19 @@ t_stack_node *top_stack(t_stack *stack);
 void ast_push(t_ast_stack *stack, t_node *node);
 void    push_stack(t_stack **stack, t_token *token);
 
+//execution//
+int is_builtin(t_node *cmd);
+void execute_ast(t_node *ast, t_env *env);
+void exec_builtin(t_cmd_node *cmd, t_env *env);
+void exec_command(t_cmd_node *cmd, t_env *env);
+void exec_external(t_cmd_node *cmd, t_env *env);
+void exec_cd(t_cmd_node *cmd, t_env *env);
+void exec_echo(t_cmd_node *cmd);
+void exec_pwd();
+void exec_export(t_cmd_node *cmd, t_env *env);
+void exec_unset(t_cmd_node *cmd, t_env *env);
+void exec_env(t_env *env);
+void exec_exit(t_cmd_node *cmd);
+t_env *init_env(char **envp);
+
 #endif 
