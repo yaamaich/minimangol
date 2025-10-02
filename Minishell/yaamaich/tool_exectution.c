@@ -6,13 +6,12 @@
 /*   By: albelaiz <albelaiz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 16:30:12 by albelaiz          #+#    #+#             */
-/*   Updated: 2025/10/01 01:09:50 by albelaiz         ###   ########.fr       */
+/*   Updated: 2025/10/02 11:01:40 by albelaiz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-//cd
 char	*set_str_env(char *key, char *value)
 {
 	char	*res;
@@ -59,27 +58,30 @@ void	set_env(char *key, char *value, char **env)
 	}
 	return (new_env);
 }
-void print_env_as_export(t_env *env)
+
+void	print_env_as_export(t_env *env)
 {
 	while (env)
 	{
-		printf("declare -x %s",env->key);
-		if(env->value)
+		printf("declare -x %s", env->key);
+		if (env->value)
 		{
 			printf("=\"%s\"", env->value);
-        	printf("\n");
-        	env = env->next;
+			printf("\n");
+			env = env->next;
 		}
 	}
 }
-void remove_env(t_env **env,char *name)
-{
-	t_env *tmp;
-	t_env *prev = NULL;
 
-	while(tmp)
+void	remove_env(t_env **env, char *name)
+{
+	t_env	*tmp;
+	t_env	*prev;
+
+	prev = NULL;
+	while (tmp)
 	{
-		if (ft_strcmp(tmp->key,name) == 0)
+		if (ft_strcmp(tmp->key, name) == 0)
 		{
 			if (prev == NULL)
 				*env = tmp->next;
@@ -88,10 +90,9 @@ void remove_env(t_env **env,char *name)
 			free(tmp->key);
 			free(tmp->value);
 			free(tmp);
-			return;
+			return ;
 		}
 		prev = tmp;
-		tmp = tmp->next; 
+		tmp = tmp->next;
 	}
-	
 }

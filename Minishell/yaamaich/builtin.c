@@ -6,7 +6,7 @@
 /*   By: albelaiz <albelaiz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 13:00:24 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/10/01 01:11:47 by albelaiz         ###   ########.fr       */
+/*   Updated: 2025/10/02 11:00:51 by albelaiz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,12 +97,61 @@ void	exec_export(t_cmd_node *cmd, t_env *env)
 		i++;
 	}
 }
-void exec_unset(t_cmd_node *cmd, t_env *env)
-{
-	int i = 1;
 
+void	exec_unset(t_cmd_node *cmd, t_env *env)
+{
+	int	i;
+
+	i = 1;
 	while (cmd->args[i])
 	{
-		remove_env(env,cmd->args[i]);
+		remove_env(env, cmd->args[i]);
 	}
+}
+
+void	exec_env(t_env *env)
+{
+	t_env	*tmp;
+
+	tmp = env;
+	while (tmp)
+	{
+		if (tmp->value == NULL)
+			printf("%s=%s\n", tmp->key, tmp->value);
+		tmp = tmp->next;
+	}
+}
+int	is_number(char *str)
+{
+	int	i;
+
+	i = 0;
+	if (str[0] == '-' || str[0] == '+')
+		i++;
+	while (str[i])
+	{
+		if (!ft_isdigit(ft_atoi(str[i])))
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+void	exec_exit(t_cmd_node *cmd)
+{
+	int	status;
+
+	printf("exit\n");
+	if (!cmd->args[1])
+		exit(0);
+	if (!is_number(cmd->args[1]))
+		printf("minishell: exit: %s: numeric argument required\n",
+			cmd->args[1]);
+	exit(255);
+	if (cmd->args[2])
+	{
+		printf("minishell: exit: too many arguments\n");
+		return ;
+	}
+	exit(ft_atoi(cmd->args[1]) % 256);
 }

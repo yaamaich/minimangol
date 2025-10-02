@@ -6,7 +6,7 @@
 /*   By: albelaiz <albelaiz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 13:00:24 by yaamaich          #+#    #+#             */
-/*   Updated: 2025/10/01 00:57:57 by albelaiz         ###   ########.fr       */
+/*   Updated: 2025/10/02 11:19:41 by albelaiz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,4 +75,6 @@ void	execute_ast(t_node *ast, t_env *env)
 		return (NULL);
 	if (ast->token_type == CMD_TOKEN)
 		exec_command(ast->cmd, env);
+	else if (ast->token_type == OP_TOKEN)
+		
 }
